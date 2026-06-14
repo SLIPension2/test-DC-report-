@@ -1,429 +1,1223 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>삼성생명 | DC 투자분석 리포트</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap');
 
-  :root {
-    /* 첨부 이미지 기반 컬러 팔레트 */
-    --blue-core:   #0055FF; /* 가장 진한 파란색 */
-    --blue-mid:    #4D88FF; /* 중간 파란색 */
-    --blue-light:  #99BBFF; /* 연한 파란색 */
-    --gray-light:  #E2E8F0; /* 현금성 자산 회색 */
-    
-    --navy:        #0A1F5C;
-    --slate:       #4A5568;
-    --smoke:       #F8F9FB;
-    --line:        #E2E8F0;
-    --white:       #FFFFFF;
-    --text:        #1A202C;
-  }
+:root {
+  --blue:       #0055FF;
+  --blue-mid:   #4D88FF;
+  --blue-light: #EBF1FF;
+  --navy:       #0A1F5C;
+  --slate:      #64748B;
+  --smoke:      #F5F7FA;
+  --line:       #E4E9F0;
+  --white:      #FFFFFF;
+  --text:       #1A202C;
+  --red:        #EF4444;
+  --green:      #10B981;
+  --warn-bg:    #FFF8E1;
+  --warn:       #F59E0B;
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'Pretendard', sans-serif;
-    background: var(--smoke);
-    color: var(--text);
-    min-height: 100vh;
-  }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--smoke);
+  color: var(--text);
+  font-size: 14px;
+  -webkit-text-size-adjust: 100%;
+}
 
-  /* ── LANDING ── */
-  #landing {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    background: linear-gradient(135deg, var(--blue-core) 0%, #003399 100%);
-    color: var(--white);
-  }
+/* ══ LANDING ══ */
+#landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 16px 60px;
+  background: linear-gradient(160deg, #0033CC 0%, #0055FF 60%, #3377FF 100%);
+}
 
-  .brand {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: rgba(255,255,255,.8);
-    margin-bottom: 16px;
-  }
+.brand {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.6);
+  margin-bottom: 20px;
+  text-align: center;
+}
 
-  .landing-title {
-    font-size: 32px;
-    font-weight: 800;
-    text-align: center;
-    line-height: 1.3;
-    margin-bottom: 30px;
-  }
+.landing-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #fff;
+  text-align: center;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
 
-  .form-card {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 40px;
-    width: 100%;
-    max-width: 540px;
-    color: var(--text);
-    box-shadow: 0 20px 40px rgba(0,0,0,.2);
-  }
+.landing-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,.65);
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
 
-  .form-section-title {
-    font-size: 12px;
-    font-weight: 800;
-    color: var(--blue-core);
-    margin-bottom: 16px;
-  }
+.form-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 24px 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
 
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 16px;
-  }
+.form-section-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--blue);
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
 
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-col { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
 
-  label { font-size: 13px; font-weight: 700; color: var(--slate); }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
 
-  input, select {
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    background: #fafafa;
-  }
-  input:focus, select:focus { border-color: var(--blue-core); background: var(--white); }
+label { font-size: 12px; font-weight: 700; color: var(--slate); }
 
-  .divider { border: none; border-top: 1px solid var(--line); margin: 24px 0; }
+input, select {
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  background: #fafbfc;
+  width: 100%;
+  transition: border-color .15s;
+  -webkit-appearance: none;
+}
+input:focus, select:focus { border-color: var(--blue); background: var(--white); }
 
-  /* product table */
-  .product-row {
-    display: grid;
-    grid-template-columns: 2fr 1.5fr 1fr 36px;
-    gap: 8px;
-    margin-bottom: 8px;
-    align-items: center;
-  }
-  .product-row input, .product-row select { padding: 10px; font-size: 13px; }
+.divider { border: none; border-top: 1px solid var(--line); margin: 20px 0; }
 
-  .btn-remove {
-    width: 36px; height: 36px;
-    background: #FEE2E2; border: none; border-radius: 8px;
-    color: #EF4444; font-size: 18px; font-weight: bold;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-  }
+/* product rows */
+.prod-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 56px 34px;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--slate);
+  letter-spacing: .5px;
+  margin-bottom: 6px;
+  padding: 0 2px;
+}
 
-  .btn-submit {
-    width: 100%;
-    background: var(--blue-core);
-    color: var(--white);
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 800;
-    padding: 16px;
-    cursor: pointer;
-    margin-top: 24px;
-    transition: background .2s;
-  }
-  .btn-submit:hover { background: #0044cc; }
+.product-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 56px 34px;
+  gap: 6px;
+  margin-bottom: 8px;
+  align-items: center;
+}
 
-  /* ── REPORT ── */
-  #report { display: none; padding: 0 0 80px; }
+.product-row input,
+.product-row select {
+  padding: 10px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+}
 
-  .report-header {
-    background: var(--white);
-    padding: 40px 0;
-    border-bottom: 1px solid var(--line);
-  }
+.btn-rm {
+  width: 34px; height: 34px;
+  background: #FEE2E2; border: none; border-radius: 8px;
+  color: var(--red); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
 
-  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+.btn-add {
+  width: 100%;
+  background: var(--blue-light);
+  border: 1.5px dashed var(--blue);
+  border-radius: 10px;
+  color: var(--blue);
+  font-size: 13px; font-weight: 700;
+  padding: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 4px;
+}
 
-  .report-main-title {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--navy);
-    margin-bottom: 24px;
-  }
+.btn-submit {
+  width: 100%;
+  background: var(--blue);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  font-size: 15px; font-weight: 800;
+  padding: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  font-family: inherit;
+  letter-spacing: .3px;
+  transition: background .15s;
+}
+.btn-submit:active { background: #0044cc; }
 
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-  }
+/* ══ REPORT ══ */
+#report { display: none; padding-bottom: 60px; }
 
-  .kpi-card {
-    background: var(--smoke);
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid var(--line);
-  }
+/* report top bar */
+.r-topbar {
+  background: var(--navy);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-  .kpi-label { font-size: 12px; font-weight: 700; color: var(--slate); margin-bottom: 8px; }
-  .kpi-value { font-size: 20px; font-weight: 800; color: var(--blue-core); }
+.r-topbar-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--white);
+}
 
-  /* sections */
-  .section {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 32px;
-    margin-top: 24px;
-    border: 1px solid var(--line);
-  }
+.btn-back {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  color: var(--white);
+  font-size: 12px; font-weight: 700;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
 
-  .section-title {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--navy);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section-title::before {
-    content: '|';
-    color: var(--blue-core);
-    font-weight: 900;
-  }
+.btn-print {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  color: var(--white);
+  font-size: 12px; font-weight: 700;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
 
-  /* donut */
-  .donut-wrap {
-    position: relative;
-    width: 200px;
-    height: 200px;
-    margin: 0 auto;
-  }
-  .donut-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .donut-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--blue-core);
-  }
+/* hero */
+.r-hero {
+  background: linear-gradient(160deg, #0033CC 0%, var(--blue) 100%);
+  padding: 28px 16px 32px;
+  color: var(--white);
+}
 
-  /* bar chart */
-  .bar-list { display: flex; flex-direction: column; gap: 16px; }
-  .bar-item { display: flex; align-items: center; gap: 16px; }
-  .bar-meta { width: 140px; font-size: 14px; font-weight: 700; color: var(--slate); }
-  .bar-track {
-    flex: 1;
-    height: 32px;
-    background: var(--smoke);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    padding-right: 12px;
-    justify-content: flex-end;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--white);
-    transition: width 1s ease-out;
-    width: 0%;
-  }
+.r-eyebrow {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 6px;
+}
 
-  /* recommendation table */
-  .rec-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 16px; }
-  .rec-table th { background: var(--smoke); padding: 12px; text-align: left; font-weight: 800; color: var(--slate); border-bottom: 2px solid var(--line); }
-  .rec-table td { padding: 16px 12px; border-bottom: 1px solid var(--line); font-weight: 600; }
-  .pct-badge { color: var(--blue-core); font-weight: 800; font-size: 16px; }
+.r-hero-name {
+  font-size: 22px; font-weight: 900;
+  margin-bottom: 4px;
+}
 
-  /* back button */
-  .back-btn {
-    display: inline-block;
-    background: var(--smoke);
-    color: var(--slate);
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-bottom: 24px;
-    text-decoration: none;
-    border: 1px solid var(--line);
-  }
+.r-hero-date {
+  font-size: 11px;
+  color: rgba(255,255,255,.45);
+  margin-bottom: 20px;
+}
+
+/* KPI cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.kpi-card {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.kpi-card.accent {
+  background: var(--blue);
+  border-color: transparent;
+}
+
+.kpi-label {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,.6);
+  letter-spacing: .5px;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-size: 18px; font-weight: 900;
+  color: var(--white);
+  line-height: 1.1;
+}
+
+/* content */
+.r-body { padding: 0 16px; }
+
+.section {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 22px 18px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+}
+
+.sec-title {
+  font-size: 15px; font-weight: 900;
+  color: var(--navy);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sec-title::before {
+  content: '';
+  width: 3px; height: 18px;
+  background: var(--blue);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.sec-sub {
+  font-size: 12px;
+  color: var(--slate);
+  margin-bottom: 16px;
+  margin-top: -10px;
+  padding-left: 11px;
+  line-height: 1.6;
+}
+
+/* donut */
+.donut-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.donut-wrap {
+  position: relative;
+  width: 160px; height: 160px;
+  flex-shrink: 0;
+}
+
+.donut-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+.donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+  color: var(--navy);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.legend { width: 100%; }
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.legend-item:last-child { border-bottom: none; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.legend-name { flex: 1; font-weight: 500; color: var(--text); }
+.legend-pct { font-weight: 800; color: var(--blue); }
+
+/* alert */
+.alert {
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 12px; font-weight: 600;
+  line-height: 1.6;
+  margin-top: 16px;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.alert.warn { background: var(--warn-bg); border-left: 4px solid var(--warn); color: #92400E; }
+.alert.ok   { background: #ECFDF5;       border-left: 4px solid var(--green); color: #065F46; }
+
+/* bar chart */
+.bar-list { display: flex; flex-direction: column; gap: 12px; }
+
+.bar-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px; font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.bar-track {
+  height: 30px;
+  background: var(--smoke);
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 12px; font-weight: 800;
+  color: var(--white);
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+  width: 0%;
+}
+
+/* rec table - mobile scroll */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -2px; }
+
+.rec-table {
+  width: 100%;
+  min-width: 440px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rec-table th {
+  background: var(--smoke);
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 11px; font-weight: 800;
+  color: var(--slate);
+  white-space: nowrap;
+}
+
+.rec-table th:first-child { border-radius: 8px 0 0 8px; }
+.rec-table th:last-child  { border-radius: 0 8px 8px 0; }
+
+.rec-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rec-table tr:last-child td { border-bottom: none; }
+
+.tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px; font-weight: 800;
+}
+.tag-blue  { background: var(--blue-light); color: var(--blue); }
+.tag-green { background: #ECFDF5; color: #059669; }
+.tag-gray  { background: var(--smoke); color: var(--slate); }
+
+.pct-badge { font-size: 15px; font-weight: 900; color: var(--blue); }
+
+/* rank */
+.rank-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.rank-circle {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--white); flex-shrink: 0;
+  box-shadow: 0 6px 20px rgba(0,85,255,.3);
+}
+
+.rank-num { font-size: 20px; font-weight: 900; line-height: 1; }
+.rank-unit { font-size: 9px; font-weight: 700; opacity: .8; }
+.rank-desc-title { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+.rank-desc-body  { font-size: 12px; color: var(--slate); line-height: 1.6; }
+
+.rank-bar-track {
+  height: 8px;
+  background: var(--smoke);
+  border-radius: 99px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.rank-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--blue), var(--blue-mid));
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  width: 0%;
+}
+
+.rank-bar-labels {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--slate);
+  margin-top: 4px;
+}
+
+/* ── ETF RANKING SECTION ── */
+.etf-rank-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.etf-tab {
+  flex: 1;
+  padding: 9px 6px;
+  border-radius: 10px;
+  font-size: 12px; font-weight: 800;
+  border: 1.5px solid var(--line);
+  background: var(--smoke);
+  color: var(--slate);
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  transition: all .15s;
+}
+
+.etf-tab.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: var(--white);
+}
+
+.etf-panel { display: none; }
+.etf-panel.active { display: block; }
+
+.etf-list { display: flex; flex-direction: column; gap: 8px; }
+
+.etf-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  background: var(--smoke);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+
+.etf-rank-badge {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--white);
+}
+
+.rank-1 { background: #FFB800; }
+.rank-2 { background: #A8B2C0; }
+.rank-3 { background: #CD7F32; }
+.rank-4, .rank-5 { background: var(--blue-mid); }
+
+.etf-info { flex: 1; min-width: 0; }
+.etf-name { font-size: 13px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.etf-detail { font-size: 11px; color: var(--slate); margin-top: 2px; }
+
+.etf-figure { text-align: right; flex-shrink: 0; }
+.etf-main-fig { font-size: 14px; font-weight: 900; }
+.etf-sub-fig  { font-size: 10px; color: var(--slate); margin-top: 2px; }
+.fig-up   { color: #EF4444; }
+.fig-down { color: #3B82F6; }
+
+.notice-box {
+  background: var(--blue-light);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 11px;
+  color: var(--blue);
+  font-weight: 600;
+  line-height: 1.6;
+  margin-top: 14px;
+}
+
+/* etf hot list */
+.hot-etf-list { display: flex; flex-direction: column; gap: 8px; }
+.hot-etf-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  background: var(--smoke);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+.hot-num {
+  width: 24px; height: 24px;
+  background: var(--blue);
+  color: var(--white);
+  border-radius: 6px;
+  font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hot-name { flex: 1; font-size: 13px; font-weight: 700; }
+.hot-badge { font-size: 11px; font-weight: 800; color: var(--blue); background: var(--blue-light); padding: 3px 8px; border-radius: 20px; }
+
+/* macro */
+.macro-box {
+  background: var(--smoke);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 12px;
+}
+.macro-box h4 { font-size: 12px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
+.macro-box p  { font-size: 12px; color: var(--slate); line-height: 1.8; }
+
+/* footer note */
+.r-footer {
+  margin-top: 32px;
+  padding: 0 16px 20px;
+  font-size: 10px;
+  color: var(--slate);
+  line-height: 1.7;
+  text-align: center;
+}
+
+@media print {
+  #landing { display: none !important; }
+  #report  { display: block !important; }
+  .r-topbar { position: static; }
+  .btn-back, .btn-print { display: none; }
+}
 </style>
 </head>
 <body>
 
+<!-- ══════════ LANDING ══════════ -->
 <div id="landing">
-  <p class="brand">SAMSUNG LIFE INSURANCE · DC Pension Analytics</p>
+  <p class="brand">SAMSUNG LIFE INSURANCE · DC PENSION</p>
   <h1 class="landing-title">퇴직연금 DC<br>투자분석 리포트</h1>
+  <p class="landing-sub">가입자 정보를 입력하면<br>맞춤형 분석 리포트를 즉시 생성합니다.</p>
 
   <div class="form-card">
-    <p class="form-section-title">기본 정보 입력</p>
-    <div class="form-row">
+    <p class="form-section-title">기본 정보</p>
+    <div class="form-col">
       <div class="form-group">
         <label>이름</label>
-        <input type="text" id="inp-name" value="김삼성" />
+        <input type="text" id="inp-name" placeholder="예: 김삼성" value="김삼성" />
       </div>
       <div class="form-group">
-        <label>생년월일 (테스트용 기본값)</label>
+        <label>생년월일</label>
         <input type="date" id="inp-birth" value="1985-05-20" />
       </div>
-    </div>
-    <div class="form-row">
       <div class="form-group">
         <label>총 적립금 (천원)</label>
-        <input type="number" id="inp-amount" value="54200" />
+        <input type="number" id="inp-amount" placeholder="예: 54200" value="54200" inputmode="numeric" />
       </div>
       <div class="form-group">
         <label>투자성향</label>
         <select id="inp-risk">
           <option value="aggressive" selected>공격투자형</option>
           <option value="growth">성장형</option>
+          <option value="balanced">위험중립형</option>
+          <option value="stable">안정추구형</option>
+          <option value="conservative">안정형</option>
         </select>
       </div>
     </div>
 
     <hr class="divider" />
+    <p class="form-section-title">현재 보유 상품</p>
 
-    <p class="form-section-title">현재 보유 상품 (테스트용 기본값)</p>
-    <div id="product-list">
-      <div class="product-row">
-        <input type="text" value="정기예금" readonly/>
-        <input type="text" value="예금/원리금" readonly/>
-        <input type="number" class="prod-pct" value="70" readonly/>
-      </div>
-      <div class="product-row">
-        <input type="text" value="국내 주식형 펀드" readonly/>
-        <input type="text" value="주식형" readonly/>
-        <input type="number" class="prod-pct" value="30" readonly/>
-      </div>
+    <div class="prod-header">
+      <span>상품명</span><span>유형</span><span>비중%</span><span></span>
     </div>
+    <div id="product-list"></div>
+    <button class="btn-add" onclick="addProduct()">+ 상품 추가</button>
 
-    <button type="button" class="btn-submit" onclick="generateReport()">분석 시작하기</button>
+    <button class="btn-submit" onclick="generateReport()">📊 분석 리포트 생성</button>
   </div>
 </div>
 
+<!-- ══════════ REPORT ══════════ -->
 <div id="report">
-  <div class="report-header">
-    <div class="container">
-      <button class="back-btn" onclick="location.reload()">← 다시 입력하기</button>
-      <h1 class="report-main-title" id="r-title">개인별 맞춤형 자산현황 및 수익률 분석 리포트</h1>
-      
-      <div class="kpi-grid">
-        <div class="kpi-card"><p class="kpi-label">가입자명</p><p class="kpi-value" id="r-name"></p></div>
-        <div class="kpi-card"><p class="kpi-label">연령대</p><p class="kpi-value">40대</p></div>
-        <div class="kpi-card"><p class="kpi-label">투자성향</p><p class="kpi-value">공격투자형</p></div>
-        <div class="kpi-card"><p class="kpi-label">사내 수익률 위치</p><p class="kpi-value">상위 15%</p></div>
-      </div>
-    </div>
+
+  <div class="r-topbar">
+    <button class="btn-back" onclick="goBack()">← 다시 입력</button>
+    <span class="r-topbar-title">DC 투자분석 리포트</span>
+    <button class="btn-print" onclick="window.print()">🖨 인쇄</button>
   </div>
 
-  <div class="container">
-    <div class="section">
-      <h2 class="section-title">현재 운용상품 현황 (본인)</h2>
-      <div class="donut-wrap">
-        <svg viewBox="0 0 36 36" id="donut-svg"></svg>
-        <div class="donut-center">안전자산 과다</div>
-      </div>
-      <p style="text-align:center; margin-top:20px; font-weight:700; color:#EF4444;">
-        ▲ 투자성향(공격투자형) 대비 안전 및 원리금 자산 비중(70%)이 지나치게 높아 자산 증식 효과가 제한될 수 있습니다.
-      </p>
-    </div>
+  <!-- hero -->
+  <div class="r-hero">
+    <p class="r-eyebrow">퇴직연금 DC · 개인 맞춤형 분석</p>
+    <h1 class="r-hero-name" id="r-hero-name"></h1>
+    <p class="r-hero-date" id="r-hero-date"></p>
+    <div class="kpi-grid" id="r-kpi"></div>
+  </div>
 
+  <div class="r-body">
+
+    <!-- 현재 운용 현황 -->
     <div class="section">
-      <h2 class="section-title">동일 연령대(40대) 수익률 상위 10% 포트폴리오 비교</h2>
-      <p style="margin-bottom:20px; font-size:14px; color:var(--slate);">* 사내 동일 연령대 그룹 중 최상위 성과자들의 평균 자산 구성입니다.</p>
-      
-      <div class="bar-list" id="r-peer-bars">
+      <h2 class="sec-title">현재 운용상품 현황</h2>
+      <p class="sec-sub" id="r-alloc-sub"></p>
+      <div class="donut-layout">
+        <div class="donut-wrap">
+          <svg viewBox="0 0 36 36" id="donut-svg"></svg>
+          <div class="donut-center" id="donut-label"></div>
         </div>
-      <p style="margin-top:20px; font-size:13px; color:var(--slate); text-align:center;">
-        ※ 상위 10% 고수익 가입자들은 장기 복리 효과를 극대화하기 위해 글로벌 성장주와 TDF 위주로 운용하고 있습니다.
+        <div class="legend" id="r-legend"></div>
+      </div>
+      <div class="alert" id="r-alert"></div>
+    </div>
+
+    <!-- 수익률 위치 -->
+    <div class="section">
+      <h2 class="sec-title">사내 동일 연령대 수익률 위치</h2>
+      <p class="sec-sub" id="r-rank-sub"></p>
+      <div class="rank-wrap">
+        <div class="rank-circle">
+          <span class="rank-num" id="r-rank-num"></span>
+          <span class="rank-unit">상위</span>
+        </div>
+        <div>
+          <p class="rank-desc-title" id="r-rank-title"></p>
+          <p class="rank-desc-body"  id="r-rank-body"></p>
+        </div>
+      </div>
+      <div class="rank-bar-track">
+        <div class="rank-bar-fill" id="rank-bar-fill"></div>
+      </div>
+      <div class="rank-bar-labels"><span>상위 1%</span><span>평균 50%</span><span>하위</span></div>
+    </div>
+
+    <!-- 상위 10% 포트폴리오 -->
+    <div class="section">
+      <h2 class="sec-title" id="r-peer-title"></h2>
+      <p class="sec-sub">사내 동일 연령대 최상위 성과자들의 평균 자산 구성입니다.</p>
+      <div class="bar-list" id="r-peer-bars"></div>
+      <p style="font-size:11px;color:var(--slate);margin-top:14px;text-align:center;">
+        ※ 상위 10% 가입자들은 글로벌 성장주와 TDF 위주로 운용하고 있습니다.
       </p>
     </div>
 
+    <!-- 추천 포트폴리오 -->
     <div class="section">
-      <h2 class="section-title">공격투자형 맞춤 추천 포트폴리오 제안</h2>
-      <table class="rec-table">
-        <thead>
-          <tr>
-            <th>자산군</th>
-            <th>카테고리</th>
-            <th>추천 상품명 (ETF/펀드)</th>
-            <th>제안 비중</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>글로벌 주식</td><td>미국 시장대표</td><td>TIGER 미국 S&P500</td><td><span class="pct-badge">40%</span></td></tr>
-          <tr><td>섹터 성장주</td><td>성장 기술주</td><td>KODEX 미국 나스닥100 TR</td><td><span class="pct-badge">30%</span></td></tr>
-          <tr><td>자산배분형</td><td>글로벌 자산배분</td><td>삼성 한국형 TDF 2045 펀드</td><td><span class="pct-badge">20%</span></td></tr>
-          <tr><td>안전자산</td><td>원리금보장</td><td>정기예금 (1년형)</td><td><span class="pct-badge">10%</span></td></tr>
-        </tbody>
-      </table>
+      <h2 class="sec-title" id="r-rec-title"></h2>
+      <p class="sec-sub" id="r-rec-sub"></p>
+      <div class="table-wrap">
+        <table class="rec-table">
+          <thead>
+            <tr><th>자산군</th><th>추천 상품</th><th>카테고리</th><th>비중</th></tr>
+          </thead>
+          <tbody id="r-rec-tbody"></tbody>
+        </table>
+      </div>
     </div>
 
-  </div>
-</div>
+    <!-- ★ ETF 랭킹 섹션 ★ -->
+    <div class="section">
+      <h2 class="sec-title">DC 가입자 ETF 랭킹</h2>
+      <p class="sec-sub">사내 DC 가입자 기준 이달의 ETF 순위입니다. (예시 데이터)</p>
+
+      <div class="etf-rank-tabs">
+        <button class="etf-tab active" onclick="switchTab('volume')">💰 거래대금 TOP 5</button>
+        <button class="etf-tab"        onclick="switchTab('return')">📈 수익률 TOP 5</button>
+        <button class="etf-tab"        onclick="switchTab('hot')">🔥 순매수 TOP 5</button>
+      </div>
+
+      <!-- 거래대금 -->
+      <div class="etf-panel active" id="panel-volume">
+        <div class="etf-list">
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-1">1</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국 S&P500</div>
+              <div class="etf-detail">미국 대형주 · 삼성자산운용</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig">3,842억</div>
+              <div class="etf-sub-fig">거래대금</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-2">2</span>
+            <div class="etf-info">
+              <div class="etf-name">KODEX 미국 나스닥100 TR</div>
+              <div class="etf-detail">미국 기술주 · 삼성자산운용</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig">2,510억</div>
+              <div class="etf-sub-fig">거래대금</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-3">3</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국테크TOP10</div>
+              <div class="etf-detail">빅테크 집중 · 미래에셋</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig">1,780억</div>
+              <div class="etf-sub-fig">거래대금</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-4">4</span>
+            <div class="etf-info">
+              <div class="etf-name">삼성 한국형 TDF 2045</div>
+              <div class="etf-detail">자산배분형 · 삼성자산운용</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig">1,230억</div>
+              <div class="etf-sub-fig">거래대금</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-5">5</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국 배당다우존스</div>
+              <div class="etf-detail">배당성장 · 미래에셋</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig">890억</div>
+              <div class="etf-sub-fig">거래대금</div>
+            </div>
+          </div>
+        </div>
+        <div class="notice-box">💡 거래대금 순위는 사내 DC 가입자 기준 최근 1개월 합산 데이터입니다. 실제 투자 시 수수료 및 운용 보수를 반드시 확인하세요.</div>
+      </div>
+
+      <!-- 수익률 -->
+      <div class="etf-panel" id="panel-return">
+        <div class="etf-list">
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-1">1</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국테크TOP10</div>
+              <div class="etf-detail">빅테크 집중 · 최근 1년</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+38.4%</div>
+              <div class="etf-sub-fig">연 수익률</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-2">2</span>
+            <div class="etf-info">
+              <div class="etf-name">KODEX 미국 나스닥100 TR</div>
+              <div class="etf-detail">미국 기술주 · 최근 1년</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+32.1%</div>
+              <div class="etf-sub-fig">연 수익률</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-3">3</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국 S&P500</div>
+              <div class="etf-detail">미국 대형주 · 최근 1년</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+26.7%</div>
+              <div class="etf-sub-fig">연 수익률</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-4">4</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국 배당다우존스</div>
+              <div class="etf-detail">배당성장 · 최근 1년</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+18.3%</div>
+              <div class="etf-sub-fig">연 수익률</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-5">5</span>
+            <div class="etf-info">
+              <div class="etf-name">삼성 한국형 TDF 2045</div>
+              <div class="etf-detail">자산배분형 · 최근 1년</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+14.2%</div>
+              <div class="etf-sub-fig">연 수익률</div>
+            </div>
+          </div>
+        </div>
+        <div class="notice-box">⚠️ 수익률은 과거 데이터 기준이며, 미래 수익을 보장하지 않습니다. 투자 전 투자설명서를 반드시 확인하세요.</div>
+      </div>
+
+      <!-- 순매수 -->
+      <div class="etf-panel" id="panel-hot">
+        <div class="etf-list">
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-1">1</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국 S&P500</div>
+              <div class="etf-detail">미국 대형주 · 순매수 1위</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+1,240억</div>
+              <div class="etf-sub-fig">순매수 금액</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-2">2</span>
+            <div class="etf-info">
+              <div class="etf-name">KODEX 미국 나스닥100 TR</div>
+              <div class="etf-detail">미국 기술주 · 순매수 2위</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+870억</div>
+              <div class="etf-sub-fig">순매수 금액</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-3">3</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국 배당다우존스</div>
+              <div class="etf-detail">배당성장 · 순매수 3위</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+560억</div>
+              <div class="etf-sub-fig">순매수 금액</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-4">4</span>
+            <div class="etf-info">
+              <div class="etf-name">TIGER 미국테크TOP10</div>
+              <div class="etf-detail">빅테크 집중 · 순매수 4위</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+430억</div>
+              <div class="etf-sub-fig">순매수 금액</div>
+            </div>
+          </div>
+          <div class="etf-item">
+            <span class="etf-rank-badge rank-5">5</span>
+            <div class="etf-info">
+              <div class="etf-name">삼성 한국형 TDF 2045</div>
+              <div class="etf-detail">자산배분형 · 순매수 5위</div>
+            </div>
+            <div class="etf-figure">
+              <div class="etf-main-fig fig-up">+310억</div>
+              <div class="etf-sub-fig">순매수 금액</div>
+            </div>
+          </div>
+        </div>
+        <div class="notice-box">💡 순매수 순위는 사내 DC 가입자 기준 최근 1개월 데이터입니다. 동일 연령대(40대) 기준 필터 적용.</div>
+      </div>
+    </div>
+
+    <!-- 매크로 -->
+    <div class="section">
+      <h2 class="sec-title">금융 시황 및 리밸런싱 근거</h2>
+      <div class="macro-box">
+        <h4>📌 매크로 환경</h4>
+        <p id="r-macro"></p>
+      </div>
+      <div class="macro-box" style="margin-top:10px;">
+        <h4>💬 담당 RM 전략 제언</h4>
+        <p id="r-rm"></p>
+      </div>
+    </div>
+
+  </div><!-- /.r-body -->
+
+  <p class="r-footer">
+    본 리포트는 교육 및 참고 목적으로 제공되며 투자 권유가 아닙니다.<br>
+    실제 투자 결정은 담당 RM과 상담 후 진행하시기 바랍니다.
+  </p>
+
+</div><!-- /#report -->
 
 <script>
-// 첨부해주신 이미지 기반 컬러 매칭 (진한파랑 -> 중간파랑 -> 연한파랑 -> 회색)
-const CHART_COLORS = ['#0055FF', '#4D88FF', '#99BBFF', '#E2E8F0']; 
+/* ── 데이터 ── */
+const COLORS = ['#0055FF','#4D88FF','#7AA8FF','#99BBFF','#C4D7FF','#E2E8F0'];
 
-function buildDonut() {
-  // 예금 70%, 주식 30% 하드코딩 (프로토타입용)
-  const r = 15.9155;
-  const circ = 2 * Math.PI * r;
-  
-  // 파란색(예금 70%), 회색(주식 30%) - 첨부 문서 도넛 스타일 반영
-  let paths = '';
-  // 70% 부분 (파란색)
-  paths += `<circle cx="18" cy="18" r="${r}" fill="none" stroke="#0055FF" stroke-width="4" stroke-dasharray="${0.7 * circ} ${0.3 * circ}" stroke-dashoffset="${circ * 0.25}" />`;
-  // 30% 부분 (회색)
-  paths += `<circle cx="18" cy="18" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="4" stroke-dasharray="${0.3 * circ} ${0.7 * circ}" stroke-dashoffset="${-((70 / 100) * circ - circ * 0.25)}" />`;
-  return paths;
+const RISK_LABEL = {
+  aggressive:'공격투자형', growth:'성장형',
+  balanced:'위험중립형', stable:'안정추구형', conservative:'안정형'
+};
+
+const DATA = {
+  aggressive: {
+    peer: [{name:'미국 기술주 ETF',pct:45},{name:'TDF (2045형)',pct:30},{name:'S&P500 지수 ETF',pct:15},{name:'현금성 자산',pct:10}],
+    rec:  [{asset:'글로벌 주식',product:'TIGER 미국 S&P500',cat:'미국 시장대표',ctag:'tag-blue',pct:40},
+           {asset:'섹터 성장주',product:'KODEX 미국 나스닥100 TR',cat:'성장 기술주',ctag:'tag-blue',pct:30},
+           {asset:'자산배분형',product:'삼성 한국형 TDF 2045 펀드',cat:'글로벌 자산배분',ctag:'tag-green',pct:20},
+           {asset:'안전자산',product:'정기예금 (1년형)',cat:'원리금보장',ctag:'tag-gray',pct:10}],
+    macro:'글로벌 금리 인하 사이클 진입 기대감 속 우량 성장주 우위 환경 지속. 미국 빅테크 실적 개선 추세가 주가 상승을 견인하고 있습니다.',
+    rm:'공격투자형 가입자는 글로벌 주식 비중 70% 이상을 권장합니다. 리밸런싱을 통해 상위 10% 성과 집단으로의 진입을 목표로 하세요.',
+    safeCap: 20
+  },
+  growth: {
+    peer: [{name:'S&P500 ETF',pct:40},{name:'TDF (2045형)',pct:35},{name:'채권형 펀드',pct:15},{name:'현금성 자산',pct:10}],
+    rec:  [{asset:'글로벌 주식',product:'TIGER 미국 S&P500',cat:'미국 시장대표',ctag:'tag-blue',pct:40},
+           {asset:'자산배분형',product:'삼성 한국형 TDF 2045 펀드',cat:'글로벌 자산배분',ctag:'tag-green',pct:35},
+           {asset:'국내 채권',product:'KODEX 국고채10년',cat:'채권형',ctag:'tag-gray',pct:15},
+           {asset:'안전자산',product:'정기예금 (1년형)',cat:'원리금보장',ctag:'tag-gray',pct:10}],
+    macro:'성장·안정 균형 전략. 금리 인하 기대로 채권 가격 상승 여력 존재. 미국 성장주와 TDF 혼합 구성이 유효합니다.',
+    rm:'성장형 투자자는 주식 40~50%, TDF·채권 40~50% 비중이 적합합니다. 연 7~9% 수익을 장기 목표로 설정하세요.',
+    safeCap: 30
+  },
+  balanced: {
+    peer: [{name:'TDF (2045형)',pct:40},{name:'채권형 펀드',pct:35},{name:'글로벌 주식 ETF',pct:25}],
+    rec:  [{asset:'자산배분형',product:'삼성 한국형 TDF 2045 펀드',cat:'글로벌 자산배분',ctag:'tag-green',pct:40},
+           {asset:'국내 채권',product:'KODEX 국고채10년',cat:'채권형',ctag:'tag-gray',pct:30},
+           {asset:'글로벌 주식',product:'TIGER 미국 S&P500',cat:'미국 시장대표',ctag:'tag-blue',pct:20},
+           {asset:'안전자산',product:'정기예금 (1년형)',cat:'원리금보장',ctag:'tag-gray',pct:10}],
+    macro:'위험중립 전략. TDF를 핵심으로 주식·채권 균형 조정 권장. 변동성 장세에서 안정적 수익을 추구합니다.',
+    rm:'TDF를 핵심 자산으로, 주식·채권 비율을 균형 있게 구성하세요. 반기 1회 리밸런싱을 권장합니다.',
+    safeCap: 50
+  },
+  stable: {
+    peer: [{name:'채권형 펀드',pct:45},{name:'정기예금',pct:35},{name:'TDF (2045형)',pct:20}],
+    rec:  [{asset:'채권형',product:'KODEX 국고채10년',cat:'채권형',ctag:'tag-gray',pct:45},
+           {asset:'안전자산',product:'정기예금 (1년형)',cat:'원리금보장',ctag:'tag-gray',pct:35},
+           {asset:'자산배분형',product:'삼성 한국형 TDF 2045 펀드',cat:'글로벌 자산배분',ctag:'tag-green',pct:20}],
+    macro:'안정 추구 전략. 채권 금리 메리트 구간에서 장기채 비중 확대 유효. 예금과 채권의 조합으로 안정적 수익을 추구합니다.',
+    rm:'안전추구형에도 TDF 20% 편입으로 장기 수익성을 확보하는 것을 권장합니다. 원금 보전을 최우선으로 하세요.',
+    safeCap: 70
+  },
+  conservative: {
+    peer: [{name:'정기예금',pct:60},{name:'채권형 펀드',pct:40}],
+    rec:  [{asset:'안전자산',product:'정기예금 (1년형)',cat:'원리금보장',ctag:'tag-gray',pct:60},
+           {asset:'채권형',product:'KODEX 국고채10년',cat:'채권형',ctag:'tag-gray',pct:40}],
+    macro:'안정형 전략. 원금 보전 최우선. 예금 금리 비교 후 유리한 기관 선택을 권장합니다.',
+    rm:'원금 보전 우선 전략을 유지하되, 단기채를 일부 편입해 초과 수익을 소폭 추구하는 방법도 고려해보세요.',
+    safeCap: 90
+  }
+};
+
+/* ── 유틸 ── */
+function getAge(birth) {
+  const t = new Date(), b = new Date(birth);
+  let a = t.getFullYear() - b.getFullYear();
+  if (t.getMonth() < b.getMonth() || (t.getMonth()===b.getMonth() && t.getDate()<b.getDate())) a--;
+  return a;
 }
 
+function getDecade(age) {
+  if (age < 30) return 20;
+  if (age < 40) return 30;
+  if (age < 50) return 40;
+  if (age < 60) return 50;
+  return 60;
+}
+
+function estimateRank(products, risk) {
+  const safeTypes = ['예금 / 원리금보장형','국내 채권형 펀드'];
+  let safe = 0, total = 0;
+  products.forEach(p => {
+    const pct = parseFloat(p.pct)||0;
+    total += pct;
+    if (safeTypes.includes(p.type)) safe += pct;
+  });
+  const safeRatio = total>0 ? (safe/total)*100 : 0;
+  const cap = DATA[risk].safeCap || 50;
+  const diff = Math.abs(safeRatio - cap);
+  if (diff <= 5)  return Math.floor(Math.random()*5)+5;
+  if (diff <= 15) return Math.floor(Math.random()*10)+10;
+  if (diff <= 30) return Math.floor(Math.random()*15)+20;
+  return Math.floor(Math.random()*20)+35;
+}
+
+function buildDonut(products) {
+  const total = products.reduce((s,p)=>s+(parseFloat(p.pct)||0),0)||100;
+  const r = 15.9155, circ = 2*Math.PI*r;
+  let out='', offset=0;
+  products.forEach((p,i)=>{
+    const share=(parseFloat(p.pct)||0)/total;
+    const dash=share*circ, gap=circ-dash;
+    out+=`<circle cx="18" cy="18" r="${r}" fill="none" stroke="${COLORS[i%COLORS.length]}" stroke-width="3.8" stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}" stroke-dashoffset="${-(offset*circ/100 - circ*0.25).toFixed(2)}"/>`;
+    offset+=share*100;
+  });
+  return out;
+}
+
+/* ── 상품 폼 ── */
+const PROD_TYPES = ['예금 / 원리금보장형','국내 주식형 펀드','국내 채권형 펀드','해외주식형 펀드','주식형 ETF','TDF (Target Date Fund)','혼합형 펀드'];
+let prodCnt=0;
+
+function addProduct(name='', type='예금 / 원리금보장형', pct='') {
+  const id=++prodCnt;
+  const div=document.createElement('div');
+  div.className='product-row';
+  div.id=`pr-${id}`;
+  div.innerHTML=`
+    <input type="text" placeholder="상품명" value="${name}"/>
+    <select>${PROD_TYPES.map(t=>`<option${t===type?' selected':''}>${t}</option>`).join('')}</select>
+    <input type="number" placeholder="%" min="0" max="100" value="${pct}" inputmode="numeric"/>
+    <button class="btn-rm" onclick="document.getElementById('pr-${id}').remove()">×</button>
+  `;
+  document.getElementById('product-list').appendChild(div);
+}
+
+/* 기본 상품 */
+addProduct('정기예금','예금 / 원리금보장형','40');
+addProduct('국내 주식형 펀드','국내 주식형 펀드','30');
+addProduct('국내 채권형 펀드','국내 채권형 펀드','30');
+
+/* ── 탭 전환 ── */
+function switchTab(key) {
+  document.querySelectorAll('.etf-tab').forEach((t,i)=>{
+    const keys=['volume','return','hot'];
+    t.classList.toggle('active', keys[i]===key);
+  });
+  document.querySelectorAll('.etf-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`panel-${key}`).classList.add('active');
+}
+
+/* ── 리포트 생성 ── */
 function generateReport() {
-  // 이름 가져오기
-  const name = document.getElementById('inp-name').value || '김삼성';
-  document.getElementById('r-name').innerText = name + ' 님';
+  const name   = document.getElementById('inp-name').value.trim()||'홍길동';
+  const birth  = document.getElementById('inp-birth').value;
+  const amount = parseInt(document.getElementById('inp-amount').value)||0;
+  const risk   = document.getElementById('inp-risk').value;
 
-  // 화면 전환 (에러 없이 무조건 넘어가게 처리)
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('report').style.display  = 'block';
-  window.scrollTo(0,0);
+  if (!birth) { alert('생년월일을 입력해주세요.'); return; }
 
-  // 도넛 차트 그리기
-  document.getElementById('donut-svg').innerHTML = buildDonut();
+  const age=getAge(birth), decade=getDecade(age);
+  const riskLabel=RISK_LABEL[risk]||'위험중립형';
 
-  // 상위 10% 바 차트 데이터 (첨부 문서 내용 그대로 적용)
-  const peerData = [
-    { name: '미국 기술주 ETF', pct: 45 },
-    { name: 'TDF (2045형)', pct: 30 },
-    { name: 'S&P500 지수 ETF', pct: 15 },
-    { name: '현금성 자산', pct: 10 }
-  ];
+  /* 상품 수집 */
+  const rows=document.querySelectorAll('#product-list .product-row');
+  const products=[];
+  let totalPct=0;
+  rows.forEach(row=>{
+    const inputs=row.querySelectorAll('input');
+    const selects=row.querySelectorAll('select');
+    const pname=inputs[0].value.trim();
+    const ptype=selects[0].value;
+    const ppct=parseFloat(inputs[1].value)||0;
+    if(pname&&ppct>0){products.push({name:pname,type:ptype,pct:ppct});totalPct+=ppct;}
+  });
 
-  // 바 차트 렌더링
-  document.getElementById('r-peer-bars').innerHTML = peerData.map((p, i) =>
+  if(!products.length){alert('상품을 1개 이상 입력해주세요.');return;}
+  if(totalPct!==100) products.forEach(p=>p.pct=Math.round(p.pct/totalPct*100));
+
+  const d=DATA[risk]||DATA['balanced'];
+  const rank=estimateRank(products,risk);
+
+  /* 안전자산 비중 */
+  const safeTypes=['예금 / 원리금보장형','국내 채권형 펀드'];
+  let safePct=0;
+  products.forEach(p=>{if(safeTypes.includes(p.type))safePct+=p.pct;});
+
+  /* 날짜 */
+  const now=new Date();
+  const dateStr=`기준일: ${now.getFullYear()}년 ${String(now.getMonth()+1).padStart(2,'0')}월 ${String(now.getDate()).padStart(2,'0')}일`;
+
+  /* hero */
+  document.getElementById('r-hero-name').textContent=`${name} 님의 투자분석 리포트`;
+  document.getElementById('r-hero-date').textContent=dateStr;
+
+  /* KPI */
+  document.getElementById('r-kpi').innerHTML=[
+    {l:'연령대',  v:`${decade}대 (${age}세)`},
+    {l:'투자성향', v:riskLabel},
+    {l:'총 적립금', v:amount?`${amount.toLocaleString()}천원`:'미입력'},
+    {l:'사내 수익률 위치', v:`상위 ${rank}%`, accent:true},
+  ].map(k=>`<div class="kpi-card${k.accent?' accent':''}"><p class="kpi-label">${k.l}</p><p class="kpi-value">${k.v}</p></div>`).join('');
+
+  /* 도넛 */
+  document.getElementById('donut-svg').innerHTML=buildDonut(products);
+  const safeGap=safePct-d.safeCap;
+  const donutMsg=safeGap>10?'안전자산 과다':safeGap<-10?'주식 비중 높음':'균형 잡힌 구성';
+  document.getElementById('donut-label').innerHTML=`<span style="font-size:13px;font-weight:900;color:var(--navy)">${donutMsg}</span>`;
+  document.getElementById('r-alloc-sub').textContent=`${products.length}개 상품 보유 · 안전자산 비중 ${safePct}%`;
+
+  /* legend */
+  document.getElementById('r-legend').innerHTML=products.map((p,i)=>
+    `<div class="legend-item">
+      <span class="legend-dot" style="background:${COLORS[i%COLORS.length]}"></span>
+      <span class="legend-name">${p.name} (${p.type})</span>
+      <span class="legend-pct">${p.pct}%</span>
+    </div>`
+  ).join('');
+
+  /* alert */
+  const alertEl=document.getElementById('r-alert');
+  if(safeGap>10){
+    alertEl.className='alert warn';
+    alertEl.innerHTML=`⚠ 투자성향(${riskLabel}) 대비 안전 및 원리금 자산 비중(${safePct}%)이 지나치게 높아 자산 증식 효과가 제한될 수 있습니다.`;
+  } else if(safeGap<-10){
+    alertEl.className='alert warn';
+    alertEl.innerHTML=`⚠ 투자성향(${riskLabel}) 대비 위험자산 비중(${100-safePct}%)이 높습니다. 변동성에 유의하세요.`;
+  } else {
+    alertEl.className='alert ok';
+    alertEl.innerHTML=`✅ 현재 포트폴리오가 투자성향(${riskLabel})에 부합합니다. 정기적 리밸런싱으로 비중을 유지하세요.`;
+  }
+
+  /* rank */
+  document.getElementById('r-rank-sub').textContent=`사내 ${decade}대 동일 연령대 기준 수익률 분포입니다.`;
+  document.getElementById('r-rank-num').textContent=`${rank}%`;
+  const rankMsg=rank<=10?'최상위 성과 그룹':rank<=25?'상위권 성과 그룹':rank<=50?'평균 이상 그룹':'평균 수준 그룹';
+  const rankBody=rank<=10?'현재 전략이 우수한 성과를 내고 있습니다. 전략을 유지하세요.':
+    rank<=25?'소폭의 리밸런싱으로 최상위 진입이 가능합니다.':'추천 포트폴리오 리밸런싱 시 상위 10~15% 진입이 기대됩니다.';
+  document.getElementById('r-rank-title').textContent=`${decade}대 ${rankMsg}`;
+  document.getElementById('r-rank-body').textContent=rankBody;
+
+  /* peer bars */
+  document.getElementById('r-peer-title').textContent=`동일 연령대(${decade}대) 상위 10% 포트폴리오`;
+  document.getElementById('r-peer-bars').innerHTML=d.peer.map((p,i)=>
     `<div class="bar-item">
-      <div class="bar-meta">${p.name}</div>
+      <div class="bar-meta"><span>${p.name}</span></div>
       <div class="bar-track">
-        <div class="bar-fill" data-pct="${p.pct}" style="background:${CHART_COLORS[i]}; color:${i===3 ? '#4A5568' : '#fff'}; width:0%">${p.pct}%</div>
+        <div class="bar-fill" data-pct="${p.pct}" style="background:${COLORS[i]}; color:${i>=3?'var(--slate)':'#fff'}; width:0%">${p.pct}%</div>
       </div>
     </div>`
   ).join('');
 
-  // 바 차트 애니메이션 실행
-  setTimeout(() => {
-    document.querySelectorAll('.bar-fill').forEach(el => {
-      el.style.width = el.dataset.pct + '%';
-    });
-  }, 100);
+  /* rec */
+  document.getElementById('r-rec-title').textContent=`${riskLabel} 맞춤 추천 포트폴리오`;
+  document.getElementById('r-rec-sub').textContent=`${name} 님의 투자성향(${riskLabel}) · ${decade}대 기반 최적화 포트폴리오`;
+  document.getElementById('r-rec-tbody').innerHTML=d.rec.map(r=>
+    `<tr><td>${r.asset}</td><td><strong>${r.product}</strong></td><td><span class="tag ${r.ctag}">${r.cat}</span></td><td><span class="pct-badge">${r.pct}%</span></td></tr>`
+  ).join('');
+
+  /* macro */
+  document.getElementById('r-macro').textContent=d.macro;
+  document.getElementById('r-rm').textContent=d.rm;
+
+  /* 화면 전환 */
+  document.getElementById('landing').style.display='none';
+  document.getElementById('report').style.display='block';
+  window.scrollTo(0,0);
+
+  /* 애니메이션 */
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill[data-pct]').forEach(el=>el.style.width=el.dataset.pct+'%');
+    document.getElementById('rank-bar-fill').style.width=Math.min(rank,98)+'%';
+  },200);
+}
+
+function goBack(){
+  document.getElementById('report').style.display='none';
+  document.getElementById('landing').style.display='flex';
+  window.scrollTo(0,0);
 }
 </script>
 </body>
