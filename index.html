@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>삼성생명 | DC 투자분석 리포트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;700;800;900&display=swap');
+
+  :root {
+    /* 첨부 이미지 기반 컬러 팔레트 */
+    --blue-core:   #0055FF; /* 가장 진한 파란색 */
+    --blue-mid:    #4D88FF; /* 중간 파란색 */
+    --blue-light:  #99BBFF; /* 연한 파란색 */
+    --gray-light:  #E2E8F0; /* 현금성 자산 회색 */
+    
+    --navy:        #0A1F5C;
+    --slate:       #4A5568;
+    --smoke:       #F8F9FB;
+    --line:        #E2E8F0;
+    --white:       #FFFFFF;
+    --text:        #1A202C;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard', sans-serif;
+    background: var(--smoke);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── LANDING ── */
+  #landing {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, var(--blue-core) 0%, #003399 100%);
+    color: var(--white);
+  }
+
+  .brand {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,.8);
+    margin-bottom: 16px;
+  }
+
+  .landing-title {
+    font-size: 32px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 30px;
+  }
+
+  .form-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 540px;
+    color: var(--text);
+    box-shadow: 0 20px 40px rgba(0,0,0,.2);
+  }
+
+  .form-section-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--blue-core);
+    margin-bottom: 16px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  label { font-size: 13px; font-weight: 700; color: var(--slate); }
+
+  input, select {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: #fafafa;
+  }
+  input:focus, select:focus { border-color: var(--blue-core); background: var(--white); }
+
+  .divider { border: none; border-top: 1px solid var(--line); margin: 24px 0; }
+
+  /* product table */
+  .product-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 36px;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .product-row input, .product-row select { padding: 10px; font-size: 13px; }
+
+  .btn-remove {
+    width: 36px; height: 36px;
+    background: #FEE2E2; border: none; border-radius: 8px;
+    color: #EF4444; font-size: 18px; font-weight: bold;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  .btn-submit {
+    width: 100%;
+    background: var(--blue-core);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 16px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: background .2s;
+  }
+  .btn-submit:hover { background: #0044cc; }
+
+  /* ── REPORT ── */
+  #report { display: none; padding: 0 0 80px; }
+
+  .report-header {
+    background: var(--white);
+    padding: 40px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  .report-main-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 24px;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .kpi-card {
+    background: var(--smoke);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--line);
+  }
+
+  .kpi-label { font-size: 12px; font-weight: 700; color: var(--slate); margin-bottom: 8px; }
+  .kpi-value { font-size: 20px; font-weight: 800; color: var(--blue-core); }
+
+  /* sections */
+  .section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 24px;
+    border: 1px solid var(--line);
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::before {
+    content: '|';
+    color: var(--blue-core);
+    font-weight: 900;
+  }
+
+  /* donut */
+  .donut-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+  }
+  .donut-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .donut-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--blue-core);
+  }
+
+  /* bar chart */
+  .bar-list { display: flex; flex-direction: column; gap: 16px; }
+  .bar-item { display: flex; align-items: center; gap: 16px; }
+  .bar-meta { width: 140px; font-size: 14px; font-weight: 700; color: var(--slate); }
+  .bar-track {
+    flex: 1;
+    height: 32px;
+    background: var(--smoke);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-right: 12px;
+    justify-content: flex-end;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--white);
+    transition: width 1s ease-out;
+    width: 0%;
+  }
+
+  /* recommendation table */
+  .rec-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 16px; }
+  .rec-table th { background: var(--smoke); padding: 12px; text-align: left; font-weight: 800; color: var(--slate); border-bottom: 2px solid var(--line); }
+  .rec-table td { padding: 16px 12px; border-bottom: 1px solid var(--line); font-weight: 600; }
+  .pct-badge { color: var(--blue-core); font-weight: 800; font-size: 16px; }
+
+  /* back button */
+  .back-btn {
+    display: inline-block;
+    background: var(--smoke);
+    color: var(--slate);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 24px;
+    text-decoration: none;
+    border: 1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+
+<div id="landing">
+  <p class="brand">SAMSUNG LIFE INSURANCE · DC Pension Analytics</p>
+  <h1 class="landing-title">퇴직연금 DC<br>투자분석 리포트</h1>
+
+  <div class="form-card">
+    <p class="form-section-title">기본 정보 입력</p>
+    <div class="form-row">
+      <div class="form-group">
+        <label>이름</label>
+        <input type="text" id="inp-name" value="김삼성" />
+      </div>
+      <div class="form-group">
+        <label>생년월일 (테스트용 기본값)</label>
+        <input type="date" id="inp-birth" value="1985-05-20" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>총 적립금 (천원)</label>
+        <input type="number" id="inp-amount" value="54200" />
+      </div>
+      <div class="form-group">
+        <label>투자성향</label>
+        <select id="inp-risk">
+          <option value="aggressive" selected>공격투자형</option>
+          <option value="growth">성장형</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <p class="form-section-title">현재 보유 상품 (테스트용 기본값)</p>
+    <div id="product-list">
+      <div class="product-row">
+        <input type="text" value="정기예금" readonly/>
+        <input type="text" value="예금/원리금" readonly/>
+        <input type="number" class="prod-pct" value="70" readonly/>
+      </div>
+      <div class="product-row">
+        <input type="text" value="국내 주식형 펀드" readonly/>
+        <input type="text" value="주식형" readonly/>
+        <input type="number" class="prod-pct" value="30" readonly/>
+      </div>
+    </div>
+
+    <button type="button" class="btn-submit" onclick="generateReport()">분석 시작하기</button>
+  </div>
+</div>
+
+<div id="report">
+  <div class="report-header">
+    <div class="container">
+      <button class="back-btn" onclick="location.reload()">← 다시 입력하기</button>
+      <h1 class="report-main-title" id="r-title">개인별 맞춤형 자산현황 및 수익률 분석 리포트</h1>
+      
+      <div class="kpi-grid">
+        <div class="kpi-card"><p class="kpi-label">가입자명</p><p class="kpi-value" id="r-name"></p></div>
+        <div class="kpi-card"><p class="kpi-label">연령대</p><p class="kpi-value">40대</p></div>
+        <div class="kpi-card"><p class="kpi-label">투자성향</p><p class="kpi-value">공격투자형</p></div>
+        <div class="kpi-card"><p class="kpi-label">사내 수익률 위치</p><p class="kpi-value">상위 15%</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <h2 class="section-title">현재 운용상품 현황 (본인)</h2>
+      <div class="donut-wrap">
+        <svg viewBox="0 0 36 36" id="donut-svg"></svg>
+        <div class="donut-center">안전자산 과다</div>
+      </div>
+      <p style="text-align:center; margin-top:20px; font-weight:700; color:#EF4444;">
+        ▲ 투자성향(공격투자형) 대비 안전 및 원리금 자산 비중(70%)이 지나치게 높아 자산 증식 효과가 제한될 수 있습니다.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">동일 연령대(40대) 수익률 상위 10% 포트폴리오 비교</h2>
+      <p style="margin-bottom:20px; font-size:14px; color:var(--slate);">* 사내 동일 연령대 그룹 중 최상위 성과자들의 평균 자산 구성입니다.</p>
+      
+      <div class="bar-list" id="r-peer-bars">
+        </div>
+      <p style="margin-top:20px; font-size:13px; color:var(--slate); text-align:center;">
+        ※ 상위 10% 고수익 가입자들은 장기 복리 효과를 극대화하기 위해 글로벌 성장주와 TDF 위주로 운용하고 있습니다.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">공격투자형 맞춤 추천 포트폴리오 제안</h2>
+      <table class="rec-table">
+        <thead>
+          <tr>
+            <th>자산군</th>
+            <th>카테고리</th>
+            <th>추천 상품명 (ETF/펀드)</th>
+            <th>제안 비중</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>글로벌 주식</td><td>미국 시장대표</td><td>TIGER 미국 S&P500</td><td><span class="pct-badge">40%</span></td></tr>
+          <tr><td>섹터 성장주</td><td>성장 기술주</td><td>KODEX 미국 나스닥100 TR</td><td><span class="pct-badge">30%</span></td></tr>
+          <tr><td>자산배분형</td><td>글로벌 자산배분</td><td>삼성 한국형 TDF 2045 펀드</td><td><span class="pct-badge">20%</span></td></tr>
+          <tr><td>안전자산</td><td>원리금보장</td><td>정기예금 (1년형)</td><td><span class="pct-badge">10%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// 첨부해주신 이미지 기반 컬러 매칭 (진한파랑 -> 중간파랑 -> 연한파랑 -> 회색)
+const CHART_COLORS = ['#0055FF', '#4D88FF', '#99BBFF', '#E2E8F0']; 
+
+function buildDonut() {
+  // 예금 70%, 주식 30% 하드코딩 (프로토타입용)
+  const r = 15.9155;
+  const circ = 2 * Math.PI * r;
+  
+  // 파란색(예금 70%), 회색(주식 30%) - 첨부 문서 도넛 스타일 반영
+  let paths = '';
+  // 70% 부분 (파란색)
+  paths += `<circle cx="18" cy="18" r="${r}" fill="none" stroke="#0055FF" stroke-width="4" stroke-dasharray="${0.7 * circ} ${0.3 * circ}" stroke-dashoffset="${circ * 0.25}" />`;
+  // 30% 부분 (회색)
+  paths += `<circle cx="18" cy="18" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="4" stroke-dasharray="${0.3 * circ} ${0.7 * circ}" stroke-dashoffset="${-((70 / 100) * circ - circ * 0.25)}" />`;
+  return paths;
+}
+
+function generateReport() {
+  // 이름 가져오기
+  const name = document.getElementById('inp-name').value || '김삼성';
+  document.getElementById('r-name').innerText = name + ' 님';
+
+  // 화면 전환 (에러 없이 무조건 넘어가게 처리)
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('report').style.display  = 'block';
+  window.scrollTo(0,0);
+
+  // 도넛 차트 그리기
+  document.getElementById('donut-svg').innerHTML = buildDonut();
+
+  // 상위 10% 바 차트 데이터 (첨부 문서 내용 그대로 적용)
+  const peerData = [
+    { name: '미국 기술주 ETF', pct: 45 },
+    { name: 'TDF (2045형)', pct: 30 },
+    { name: 'S&P500 지수 ETF', pct: 15 },
+    { name: '현금성 자산', pct: 10 }
+  ];
+
+  // 바 차트 렌더링
+  document.getElementById('r-peer-bars').innerHTML = peerData.map((p, i) =>
+    `<div class="bar-item">
+      <div class="bar-meta">${p.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" data-pct="${p.pct}" style="background:${CHART_COLORS[i]}; color:${i===3 ? '#4A5568' : '#fff'}; width:0%">${p.pct}%</div>
+      </div>
+    </div>`
+  ).join('');
+
+  // 바 차트 애니메이션 실행
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 100);
+}
+</script>
+</body>
+</html>
