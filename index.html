@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>삼성생명 | DC 투자분석 리포트</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap');
 
@@ -158,6 +159,40 @@ input:focus, select:focus { border-color: var(--blue); background: var(--white);
   font-family: inherit;
   margin-top: 4px;
 }
+
+/* 엑셀 업로드 영역 */
+.excel-upload-wrap {
+  margin-bottom: 16px;
+}
+
+.excel-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: #F0FFF4;
+  border: 1.5px dashed #10B981;
+  border-radius: 12px;
+  color: #065F46;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.excel-upload-label:hover { background: #DCFCE7; }
+.excel-upload-label input[type="file"] { display: none; }
+
+.excel-status {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  display: none;
+}
+.excel-status.ok   { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+.excel-status.err  { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
 
 .btn-submit {
   width: 100%;
@@ -605,6 +640,175 @@ input:focus, select:focus { border-color: var(--blue); background: var(--white);
   .r-topbar { position: static; }
   .btn-back, .btn-print { display: none; }
 }
+
+/* ── ETF 포트폴리오 빌더 ── */
+.etf-search-wrap {
+  margin-bottom: 14px;
+  position: relative;
+}
+.etf-search-wrap input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--smoke);
+  outline: none;
+}
+.etf-search-wrap input:focus { border-color: var(--blue); background: var(--white); }
+
+.cat-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.cat-tab {
+  padding: 7px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--line);
+  background: var(--smoke);
+  color: var(--slate);
+  font-size: 12px; font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.cat-tab.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: var(--white);
+}
+
+.etf-pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.etf-pick-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--smoke);
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  cursor: pointer;
+  transition: all .15s;
+}
+.etf-pick-item:hover { border-color: var(--blue-mid); background: var(--blue-light); }
+.etf-pick-item.selected { border-color: var(--blue); background: var(--blue-light); }
+
+.etf-pick-check {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  border: 2px solid var(--line);
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+  transition: all .15s;
+}
+.etf-pick-item.selected .etf-pick-check {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: var(--white);
+}
+
+.etf-pick-info { flex: 1; min-width: 0; }
+.etf-pick-name { font-size: 13px; font-weight: 800; color: var(--text); }
+.etf-pick-meta { font-size: 11px; color: var(--slate); margin-top: 2px; }
+
+.etf-pick-tag {
+  font-size: 10px; font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+.tag-us    { background: #EFF6FF; color: #1D4ED8; }
+.tag-kr    { background: #FFF7ED; color: #C2410C; }
+.tag-bond  { background: #F0FDF4; color: #15803D; }
+.tag-tdf   { background: #FAF5FF; color: #7E22CE; }
+.tag-theme { background: #FFFBEB; color: #B45309; }
+
+/* 포트폴리오 요약 */
+.portfolio-summary {
+  background: var(--navy);
+  border-radius: 14px;
+  padding: 18px 16px;
+  color: var(--white);
+}
+.portfolio-summary-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px; font-weight: 800;
+  margin-bottom: 14px;
+}
+.pf-total-badge {
+  font-size: 12px; font-weight: 800;
+  background: rgba(255,255,255,.15);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.pf-total-badge.ok  { background: #10B981; }
+.pf-total-badge.over { background: #EF4444; }
+
+.pf-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.pf-item:last-child { border-bottom: none; }
+.pf-item-name { flex: 1; font-size: 12px; font-weight: 600; }
+.pf-item-input {
+  width: 64px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.3);
+  background: rgba(255,255,255,.1);
+  color: var(--white);
+  font-size: 13px; font-weight: 800;
+  text-align: center;
+  font-family: inherit;
+}
+.pf-item-unit { font-size: 11px; opacity: .6; }
+.pf-item-del {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: rgba(239,68,68,.3);
+  border: none;
+  color: #FCA5A5;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.pf-warning {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  background: rgba(245,158,11,.2);
+  color: #FCD34D;
+  border: 1px solid rgba(245,158,11,.4);
+}
+
+.etf-empty {
+  text-align: center;
+  padding: 24px;
+  color: var(--slate);
+  font-size: 13px;
+}
 </style>
 </head>
 <body>
@@ -644,6 +848,15 @@ input:focus, select:focus { border-color: var(--blue); background: var(--white);
 
     <hr class="divider" />
     <p class="form-section-title">현재 보유 상품</p>
+
+    <!-- 엑셀 업로드 -->
+    <div class="excel-upload-wrap">
+      <label class="excel-upload-label">
+        <input type="file" id="excel-file" accept=".xlsx,.xls" onchange="handleExcelUpload(this)"/>
+        📂 엑셀 파일 업로드하면 자동으로 채워져요
+      </label>
+      <div class="excel-status" id="excel-status"></div>
+    </div>
 
     <div class="prod-header">
       <span>상품명</span><span>유형</span><span>비중%</span><span></span>
@@ -688,8 +901,34 @@ input:focus, select:focus { border-color: var(--blue); background: var(--white);
       <div class="alert" id="r-alert"></div>
     </div>
 
-    <!-- 수익률 위치 -->
-    <div class="section">
+    <!-- ★ ETF 포트폴리오 구성 ★ -->
+    <div class="section" id="etf-builder-section">
+      <h2 class="sec-title">추천 포트폴리오 구성</h2>
+      <p class="sec-sub">ETF를 검색하거나 카테고리에서 선택해 포트폴리오를 직접 구성하세요.</p>
+      <div class="etf-search-wrap">
+        <input type="text" id="etf-search-input" placeholder="🔍 ETF 검색 (예: S&amp;P500, 나스닥, 반도체...)" oninput="filterEtf()" autocomplete="off"/>
+      </div>
+      <div class="cat-tabs">
+        <button class="cat-tab active" onclick="setCat('all',this)">전체</button>
+        <button class="cat-tab" onclick="setCat('us',this)">🇺🇸 미국주식</button>
+        <button class="cat-tab" onclick="setCat('kr',this)">🇰🇷 국내주식</button>
+        <button class="cat-tab" onclick="setCat('bond',this)">📄 채권</button>
+        <button class="cat-tab" onclick="setCat('tdf',this)">🎯 TDF</button>
+        <button class="cat-tab" onclick="setCat('theme',this)">💡 테마</button>
+      </div>
+      <div class="etf-pick-list" id="etf-pick-list"></div>
+      <div class="portfolio-summary" id="portfolio-summary" style="display:none;">
+        <div class="portfolio-summary-title">
+          <span>📋 구성된 포트폴리오</span>
+          <span class="pf-total-badge" id="pf-total-pct">합계: 0%</span>
+        </div>
+        <div id="portfolio-items"></div>
+        <div class="pf-warning" id="pf-warning" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- 수익률 위치 (삭제) -->
+    <div class="section" style="display:none;">
       <h2 class="sec-title">사내 동일 연령대 수익률 위치</h2>
       <p class="sec-sub" id="r-rank-sub"></p>
       <div class="rank-wrap">
@@ -706,30 +945,6 @@ input:focus, select:focus { border-color: var(--blue); background: var(--white);
         <div class="rank-bar-fill" id="rank-bar-fill"></div>
       </div>
       <div class="rank-bar-labels"><span>상위 1%</span><span>평균 50%</span><span>하위</span></div>
-    </div>
-
-    <!-- 상위 10% 포트폴리오 -->
-    <div class="section">
-      <h2 class="sec-title" id="r-peer-title"></h2>
-      <p class="sec-sub">사내 동일 연령대 최상위 성과자들의 평균 자산 구성입니다.</p>
-      <div class="bar-list" id="r-peer-bars"></div>
-      <p style="font-size:11px;color:var(--slate);margin-top:14px;text-align:center;">
-        ※ 상위 10% 가입자들은 글로벌 성장주와 TDF 위주로 운용하고 있습니다.
-      </p>
-    </div>
-
-    <!-- 추천 포트폴리오 -->
-    <div class="section">
-      <h2 class="sec-title" id="r-rec-title"></h2>
-      <p class="sec-sub" id="r-rec-sub"></p>
-      <div class="table-wrap">
-        <table class="rec-table">
-          <thead>
-            <tr><th>자산군</th><th>추천 상품</th><th>카테고리</th><th>비중</th></tr>
-          </thead>
-          <tbody id="r-rec-tbody"></tbody>
-        </table>
-      </div>
     </div>
 
     <!-- ★ ETF 랭킹 섹션 ★ -->
@@ -930,18 +1145,7 @@ input:focus, select:focus { border-color: var(--blue); background: var(--white);
       </div>
     </div>
 
-    <!-- 매크로 -->
-    <div class="section">
-      <h2 class="sec-title">금융 시황 및 리밸런싱 근거</h2>
-      <div class="macro-box">
-        <h4>📌 매크로 환경</h4>
-        <p id="r-macro"></p>
-      </div>
-      <div class="macro-box" style="margin-top:10px;">
-        <h4>💬 담당 RM 전략 제언</h4>
-        <p id="r-rm"></p>
-      </div>
-    </div>
+
 
   </div><!-- /.r-body -->
 
@@ -1080,6 +1284,114 @@ addProduct('정기예금','예금 / 원리금보장형','40');
 addProduct('국내 주식형 펀드','국내 주식형 펀드','30');
 addProduct('국내 채권형 펀드','국내 채권형 펀드','30');
 
+/* ── 엑셀 업로드 ── */
+
+// 엑셀 상품유형 → 폼 유형 매핑
+function mapType(rawType) {
+  if (!rawType) return '혼합형 펀드';
+  const t = rawType.toString().trim();
+  if (t.includes('주식형') && (t.includes('해외') || t.includes('미국') || t.includes('글로벌'))) return '해외주식형 펀드';
+  if (t.includes('주식형')) return '주식형 ETF';
+  if (t.includes('채권혼합') || t.includes('혼합')) return '혼합형 펀드';
+  if (t.includes('채권형') && (t.includes('해외') || t.includes('미국'))) return '혼합형 펀드';
+  if (t.includes('채권형')) return '국내 채권형 펀드';
+  if (t.includes('예금') || t.includes('원리금')) return '예금 / 원리금보장형';
+  if (t.includes('TDF') || t.includes('tdf')) return 'TDF (Target Date Fund)';
+  return '혼합형 펀드';
+}
+
+function handleExcelUpload(input) {
+  const file = input.files[0];
+  const statusEl = document.getElementById('excel-status');
+
+  if (!file) return;
+
+  // SheetJS 로드 확인
+  if (typeof XLSX === 'undefined') {
+    statusEl.className = 'excel-status err';
+    statusEl.style.display = 'block';
+    statusEl.textContent = '❌ 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+      // 헤더 행 찾기 (상품명 컬럼이 있는 행)
+      let headerRow = -1;
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].some(cell => String(cell).includes('상품명'))) {
+          headerRow = i;
+          break;
+        }
+      }
+
+      if (headerRow === -1) {
+        throw new Error('상품명 컬럼을 찾을 수 없습니다.');
+      }
+
+      // 헤더에서 컬럼 인덱스 찾기
+      const headers = rows[headerRow].map(h => String(h).trim());
+      const nameIdx   = headers.findIndex(h => h.includes('상품명'));
+      const typeIdx   = headers.findIndex(h => h.includes('상품유형'));
+      const amountIdx = headers.findIndex(h => h.includes('적립금'));
+
+      // 데이터 행 수집 (합계 제외)
+      const products = [];
+      let totalAmount = 0;
+
+      for (let i = headerRow + 1; i < rows.length; i++) {
+        const row = rows[i];
+        const name   = String(row[nameIdx] || '').trim();
+        const type   = String(row[typeIdx] || '').trim();
+        const amount = parseFloat(String(row[amountIdx] || '0').replace(/,/g, '')) || 0;
+
+        // 합계 행 또는 빈 행 제외
+        if (!name || name === '합계' || name === '' || amount <= 0) continue;
+
+        products.push({ name, type, amount });
+        totalAmount += amount;
+      }
+
+      if (products.length === 0) {
+        throw new Error('유효한 상품 데이터가 없습니다.');
+      }
+
+      // 기존 상품 목록 초기화
+      document.getElementById('product-list').innerHTML = '';
+      prodCnt = 0;
+
+      // 상품 비중 계산 후 추가
+      products.forEach(p => {
+        const pct = totalAmount > 0 ? Math.round((p.amount / totalAmount) * 100) : 0;
+        addProduct(p.name, mapType(p.type), pct);
+      });
+
+      // 총 적립금 자동 입력 (원 → 천원 변환)
+      const totalInThousands = Math.round(totalAmount / 1000);
+      document.getElementById('inp-amount').value = totalInThousands;
+
+      // 성공 메시지
+      statusEl.className = 'excel-status ok';
+      statusEl.style.display = 'block';
+      statusEl.innerHTML = `✅ <strong>${products.length}개 상품</strong> 불러오기 완료 · 총 적립금 <strong>${totalInThousands.toLocaleString()}천원</strong> 자동 입력됨`;
+
+    } catch (err) {
+      statusEl.className = 'excel-status err';
+      statusEl.style.display = 'block';
+      statusEl.textContent = `❌ 오류: ${err.message}. 엑셀 형식을 확인해주세요.`;
+      console.error(err);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
 /* ── 탭 전환 ── */
 function switchTab(key) {
   document.querySelectorAll('.etf-tab').forEach((t,i)=>{
@@ -1118,8 +1430,7 @@ function generateReport() {
   if(!products.length){alert('상품을 1개 이상 입력해주세요.');return;}
   if(totalPct!==100) products.forEach(p=>p.pct=Math.round(p.pct/totalPct*100));
 
-  const d=DATA[risk]||DATA['balanced'];
-  const rank=estimateRank(products,risk);
+  const d=DATA[risk]||DATA['balanced']; // 향후 확장용
 
   /* 안전자산 비중 */
   const safeTypes=['예금 / 원리금보장형','국내 채권형 펀드'];
@@ -1171,53 +1482,172 @@ function generateReport() {
     alertEl.innerHTML=`✅ 현재 포트폴리오가 투자성향(${riskLabel})에 부합합니다. 정기적 리밸런싱으로 비중을 유지하세요.`;
   }
 
-  /* rank */
-  document.getElementById('r-rank-sub').textContent=`사내 ${decade}대 동일 연령대 기준 수익률 분포입니다.`;
-  document.getElementById('r-rank-num').textContent=`${rank}%`;
-  const rankMsg=rank<=10?'최상위 성과 그룹':rank<=25?'상위권 성과 그룹':rank<=50?'평균 이상 그룹':'평균 수준 그룹';
-  const rankBody=rank<=10?'현재 전략이 우수한 성과를 내고 있습니다. 전략을 유지하세요.':
-    rank<=25?'소폭의 리밸런싱으로 최상위 진입이 가능합니다.':'추천 포트폴리오 리밸런싱 시 상위 10~15% 진입이 기대됩니다.';
-  document.getElementById('r-rank-title').textContent=`${decade}대 ${rankMsg}`;
-  document.getElementById('r-rank-body').textContent=rankBody;
-
-  /* peer bars */
-  document.getElementById('r-peer-title').textContent=`동일 연령대(${decade}대) 상위 10% 포트폴리오`;
-  document.getElementById('r-peer-bars').innerHTML=d.peer.map((p,i)=>
-    `<div class="bar-item">
-      <div class="bar-meta"><span>${p.name}</span></div>
-      <div class="bar-track">
-        <div class="bar-fill" data-pct="${p.pct}" style="background:${COLORS[i]}; color:${i>=3?'var(--slate)':'#fff'}; width:0%">${p.pct}%</div>
-      </div>
-    </div>`
-  ).join('');
-
-  /* rec */
-  document.getElementById('r-rec-title').textContent=`${riskLabel} 맞춤 추천 포트폴리오`;
-  document.getElementById('r-rec-sub').textContent=`${name} 님의 투자성향(${riskLabel}) · ${decade}대 기반 최적화 포트폴리오`;
-  document.getElementById('r-rec-tbody').innerHTML=d.rec.map(r=>
-    `<tr><td>${r.asset}</td><td><strong>${r.product}</strong></td><td><span class="tag ${r.ctag}">${r.cat}</span></td><td><span class="pct-badge">${r.pct}%</span></td></tr>`
-  ).join('');
-
-  /* macro */
-  document.getElementById('r-macro').textContent=d.macro;
-  document.getElementById('r-rm').textContent=d.rm;
+  /* ETF 빌더 초기화 */
+  portfolio = {};
+  renderEtfList();
+  renderPortfolio();
 
   /* 화면 전환 */
   document.getElementById('landing').style.display='none';
   document.getElementById('report').style.display='block';
   window.scrollTo(0,0);
-
-  /* 애니메이션 */
-  setTimeout(()=>{
-    document.querySelectorAll('.bar-fill[data-pct]').forEach(el=>el.style.width=el.dataset.pct+'%');
-    document.getElementById('rank-bar-fill').style.width=Math.min(rank,98)+'%';
-  },200);
 }
 
 function goBack(){
   document.getElementById('report').style.display='none';
   document.getElementById('landing').style.display='flex';
   window.scrollTo(0,0);
+}
+
+/* ══════════════════════════════
+   ETF 포트폴리오 빌더
+══════════════════════════════ */
+const ETF_DB = [
+  // 미국주식
+  {name:'TIGER 미국 S&P500',          cat:'us',    tag:'미국주식', detail:'미국 대형주 500종목 · 미래에셋'},
+  {name:'KODEX 미국 S&P500TR',         cat:'us',    tag:'미국주식', detail:'S&P500 TR · 삼성자산운용'},
+  {name:'KODEX 미국 나스닥100 TR',      cat:'us',    tag:'미국주식', detail:'나스닥100 TR · 삼성자산운용'},
+  {name:'TIGER 미국 나스닥100',         cat:'us',    tag:'미국주식', detail:'나스닥100 · 미래에셋'},
+  {name:'TIGER 미국테크TOP10',          cat:'us',    tag:'미국주식', detail:'빅테크 10종목 · 미래에셋'},
+  {name:'KODEX 미국빅테크10',           cat:'us',    tag:'미국주식', detail:'빅테크 집중 · 삼성자산운용'},
+  {name:'TIGER 미국 배당다우존스',       cat:'us',    tag:'미국주식', detail:'배당성장 · 미래에셋'},
+  {name:'ACE 미국S&P500미국채혼합50',   cat:'us',    tag:'미국주식', detail:'주식50+채권50 · 한국투자신탁'},
+  {name:'ACE 미국나스닥100미국채혼합50', cat:'us',    tag:'미국주식', detail:'나스닥50+채권50 · 한국투자신탁'},
+  // 국내주식
+  {name:'KODEX 200',                   cat:'kr',    tag:'국내주식', detail:'코스피200 · 삼성자산운용'},
+  {name:'TIGER 200',                   cat:'kr',    tag:'국내주식', detail:'코스피200 · 미래에셋'},
+  {name:'KODEX 삼성그룹',              cat:'kr',    tag:'국내주식', detail:'삼성그룹주 · 삼성자산운용'},
+  {name:'ACE KRX금현물',               cat:'kr',    tag:'국내주식', detail:'금 현물 · 한국투자신탁'},
+  {name:'ACE AI반도체TOP3+',           cat:'kr',    tag:'국내주식', detail:'AI반도체 · 한국투자신탁'},
+  // 채권
+  {name:'KODEX 국고채10년',            cat:'bond',  tag:'채권',    detail:'국고채 10년 · 삼성자산운용'},
+  {name:'TIGER 국채3년',               cat:'bond',  tag:'채권',    detail:'국채 3년 · 미래에셋'},
+  {name:'KBSTAR 단기채권',             cat:'bond',  tag:'채권',    detail:'단기채권 · KB자산운용'},
+  {name:'ACE 미국30년국채',            cat:'bond',  tag:'채권',    detail:'미국 장기채 · 한국투자신탁'},
+  {name:'정기예금 (1년형)',            cat:'bond',  tag:'채권',    detail:'원리금보장 · 삼성생명'},
+  // TDF
+  {name:'삼성 한국형 TDF 2030',        cat:'tdf',   tag:'TDF',     detail:'2030년 목표 · 삼성자산운용'},
+  {name:'삼성 한국형 TDF 2035',        cat:'tdf',   tag:'TDF',     detail:'2035년 목표 · 삼성자산운용'},
+  {name:'삼성 한국형 TDF 2040',        cat:'tdf',   tag:'TDF',     detail:'2040년 목표 · 삼성자산운용'},
+  {name:'삼성 한국형 TDF 2045',        cat:'tdf',   tag:'TDF',     detail:'2045년 목표 · 삼성자산운용'},
+  {name:'삼성 한국형 TDF 2050',        cat:'tdf',   tag:'TDF',     detail:'2050년 목표 · 삼성자산운용'},
+  {name:'삼성 한국형 TDF 2055',        cat:'tdf',   tag:'TDF',     detail:'2055년 목표 · 삼성자산운용'},
+  // 테마
+  {name:'TIGER 글로벌리튬&2차전지',    cat:'theme', tag:'테마',    detail:'2차전지 · 미래에셋'},
+  {name:'KODEX 인도 Nifty50',         cat:'theme', tag:'테마',    detail:'인도주식 · 삼성자산운용'},
+  {name:'TIGER 글로벌AI',             cat:'theme', tag:'테마',    detail:'글로벌AI · 미래에셋'},
+  {name:'KODEX 미국AI테크',           cat:'theme', tag:'테마',    detail:'미국AI · 삼성자산운용'},
+  {name:'TIGER 차이나CSI300',         cat:'theme', tag:'테마',    detail:'중국주식 · 미래에셋'},
+];
+
+const TAG_CLASS = {us:'tag-us', kr:'tag-kr', bond:'tag-bond', tdf:'tag-tdf', theme:'tag-theme'};
+
+let currentCat = 'all';
+let portfolio = {}; // {etfName: pct}
+
+function renderEtfList() {
+  const keyword = (document.getElementById('etf-search-input').value || '').toLowerCase();
+  const filtered = ETF_DB.filter(e => {
+    const catMatch = currentCat === 'all' || e.cat === currentCat;
+    const keyMatch = !keyword || e.name.toLowerCase().includes(keyword) || e.detail.toLowerCase().includes(keyword);
+    return catMatch && keyMatch;
+  });
+
+  const el = document.getElementById('etf-pick-list');
+  if (filtered.length === 0) {
+    el.innerHTML = `<div class="etf-empty">검색 결과가 없습니다.</div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map(e => {
+    const sel = portfolio.hasOwnProperty(e.name);
+    return `
+      <div class="etf-pick-item${sel?' selected':''}" onclick="toggleEtf('${e.name.replace(/'/g,"\\'")}')">
+        <div class="etf-pick-check">${sel ? '✓' : ''}</div>
+        <div class="etf-pick-info">
+          <div class="etf-pick-name">${e.name}</div>
+          <div class="etf-pick-meta">${e.detail}</div>
+        </div>
+        <span class="etf-pick-tag ${TAG_CLASS[e.cat]}">${e.tag}</span>
+      </div>`;
+  }).join('');
+}
+
+function toggleEtf(name) {
+  if (portfolio.hasOwnProperty(name)) {
+    delete portfolio[name];
+  } else {
+    // 기본 비중: 100 / 현재 선택 수
+    portfolio[name] = 0;
+    redistributePct();
+  }
+  renderEtfList();
+  renderPortfolio();
+}
+
+function redistributePct() {
+  const keys = Object.keys(portfolio);
+  if (keys.length === 0) return;
+  const each = Math.floor(100 / keys.length);
+  const remainder = 100 - each * keys.length;
+  keys.forEach((k, i) => { portfolio[k] = each + (i === 0 ? remainder : 0); });
+}
+
+function renderPortfolio() {
+  const keys = Object.keys(portfolio);
+  const summaryEl = document.getElementById('portfolio-summary');
+  const itemsEl   = document.getElementById('portfolio-items');
+  const warnEl    = document.getElementById('pf-warning');
+  const totalEl   = document.getElementById('pf-total-pct');
+
+  if (keys.length === 0) { summaryEl.style.display = 'none'; return; }
+  summaryEl.style.display = 'block';
+
+  itemsEl.innerHTML = keys.map(name => `
+    <div class="pf-item">
+      <span class="pf-item-name">${name}</span>
+      <input class="pf-item-input" type="number" min="0" max="100"
+        value="${portfolio[name]}"
+        onchange="updatePct('${name.replace(/'/g,"\\'")}', this.value)"
+        inputmode="numeric"/>
+      <span class="pf-item-unit">%</span>
+      <button class="pf-item-del" onclick="removeEtf('${name.replace(/'/g,"\\'")}')">×</button>
+    </div>`).join('');
+
+  const total = keys.reduce((s, k) => s + (parseInt(portfolio[k]) || 0), 0);
+  totalEl.textContent = `합계: ${total}%`;
+  totalEl.className = 'pf-total-badge' + (total === 100 ? ' ok' : total > 100 ? ' over' : '');
+
+  if (total !== 100) {
+    warnEl.style.display = 'block';
+    warnEl.textContent = total > 100
+      ? `⚠ 합계가 ${total}%입니다. 100%가 되도록 조정해주세요.`
+      : `⚠ 합계가 ${total}%입니다. ${100 - total}%를 추가 배분해주세요.`;
+  } else {
+    warnEl.style.display = 'none';
+  }
+}
+
+function updatePct(name, val) {
+  portfolio[name] = parseInt(val) || 0;
+  renderPortfolio();
+}
+
+function removeEtf(name) {
+  delete portfolio[name];
+  renderEtfList();
+  renderPortfolio();
+}
+
+function setCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderEtfList();
+}
+
+function filterEtf() {
+  renderEtfList();
 }
 </script>
 </body>
