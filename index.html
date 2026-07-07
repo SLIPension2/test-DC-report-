@@ -447,7 +447,6 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
         📂 엑셀 파일 업로드하면 자동으로 채워져요
       </label>
       <p style="font-size:11px;color:var(--slate);margin-top:6px;text-align:center;">📱 모바일: 파일 앱에서 .xlsx 파일 선택</p>
-      </label>
       <div class="excel-status" id="excel-status"></div>
     </div>
 
@@ -625,7 +624,8 @@ function doLogin(){
   // 로그인 성공
   errEl.style.display='none';
   document.getElementById('login-screen').style.display='none';
-  document.getElementById('landing').style.display='flex';
+  const landingEl = document.getElementById('landing');
+  landingEl.style.display='flex';
 
   // 이름 입력란에 사번 자동 입력 (편의)
   const nameInput = document.getElementById('inp-name');
