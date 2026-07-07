@@ -1,0 +1,33 @@
+name: 매일 ETF 데이터 업데이트
+
+on:
+  schedule:
+    - cron: '0 22 * * 1-5'  # 평일 오전 7시 KST (UTC 22시)
+  workflow_dispatch:          # 수동 실행도 가능
+
+jobs:
+  update-etf-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v3
+
+      - name: Python 설치
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: pykrx 설치
+        run: pip install pykrx pandas
+
+      - name: ETF 데이터 수집
+        run: python fetch_etf.py
+
+      - name: 변경사항 커밋 & 푸시
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add etf_data.json
+          git diff --staged --quiet || git commit -m "📊 ETF 데이터 자동 업데이트 $(date '+%Y-%m-%d')"
+          git push
