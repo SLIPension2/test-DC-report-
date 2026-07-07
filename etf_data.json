@@ -1,0 +1,17 @@
+{
+  "date": "2026.07.04",
+  "volume": [
+    {"name": "TIGER 미국 S&P500",      "detail": "미국 대형주 · 미래에셋",    "volume": 384200000000, "change_pct": 1.23},
+    {"name": "KODEX 미국나스닥100 TR",  "detail": "나스닥100 · 삼성자산운용",  "volume": 251000000000, "change_pct": 0.87},
+    {"name": "TIGER 미국테크TOP10",     "detail": "빅테크 · 미래에셋",         "volume": 178000000000, "change_pct": 2.11},
+    {"name": "삼성 한국형 TDF 2045",    "detail": "자산배분형 · 삼성자산운용", "volume": 123000000000, "change_pct": 0.45},
+    {"name": "TIGER 미국 배당다우존스", "detail": "배당성장 · 미래에셋",        "volume": 89000000000,  "change_pct": 0.92}
+  ],
+  "return": [
+    {"name": "TIGER 미국테크TOP10",     "detail": "빅테크 · 미래에셋",         "volume": 0, "change_pct": 3.84},
+    {"name": "KODEX 미국나스닥100 TR",  "detail": "나스닥100 · 삼성자산운용",  "volume": 0, "change_pct": 3.21},
+    {"name": "TIGER 미국 S&P500",      "detail": "미국 대형주 · 미래에셋",    "volume": 0, "change_pct": 2.67},
+    {"name": "TIGER 미국 배당다우존스", "detail": "배당성장 · 미래에셋",        "volume": 0, "change_pct": 1.83},
+    {"name": "삼성 한국형 TDF 2045",    "detail": "자산배분형 · 삼성자산운용", "volume": 0, "change_pct": 1.42}
+  ]
+}
