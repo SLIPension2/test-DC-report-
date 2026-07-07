@@ -183,6 +183,35 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 .etf-empty{text-align:center;padding:24px;color:var(--slate);font-size:13px;}
 .etf-search-count{font-size:11px;color:var(--slate);margin-bottom:8px;padding-left:2px;}
 
+.legend-name-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.legend-name{font-weight:600;color:var(--text);font-size:12px;}
+.legend-gubun{font-size:10px;color:var(--slate);}
+.legend-ret{font-size:11px;font-weight:800;}
+.legend-profit{font-size:10px;font-weight:600;}
+
+/* 포트폴리오 스텝 */
+.pf-step-title{font-size:12px;font-weight:800;color:var(--navy);padding:8px 12px;background:var(--blue-light);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--blue);}
+.pf-section-label{font-size:11px;font-weight:800;color:rgba(255,255,255,.5);margin:10px 0 6px;letter-spacing:.5px;}
+.pf-compare-box{margin-top:16px;background:rgba(255,255,255,.08);border-radius:10px;padding:14px;}
+.pf-compare-title{font-size:12px;font-weight:800;margin-bottom:10px;color:rgba(255,255,255,.8);}
+.pf-compare-row{display:flex;align-items:center;gap:8px;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);}
+.pf-compare-row:last-child{border-bottom:none;}
+.pf-compare-name{flex:1;font-weight:600;}
+.pf-compare-badge{padding:2px 7px;border-radius:10px;font-size:10px;font-weight:800;}
+.badge-keep{background:rgba(16,185,129,.3);color:#6EE7B7;}
+.badge-remove{background:rgba(239,68,68,.3);color:#FCA5A5;}
+.badge-add{background:rgba(59,130,246,.3);color:#93C5FD;}
+.current-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--smoke);border-radius:10px;border:1.5px solid var(--line);cursor:pointer;transition:all .15s;margin-bottom:6px;}
+.current-item.excluded{opacity:.5;border-color:#FCA5A5;background:#FEF2F2;}
+.current-item-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--line);background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;transition:all .15s;}
+.current-item:not(.excluded) .current-item-check{background:var(--green);border-color:var(--green);color:var(--white);}
+.current-item-info{flex:1;min-width:0;}
+.current-item-name{font-size:13px;font-weight:800;color:var(--text);}
+.current-item-meta{font-size:10px;color:var(--slate);margin-top:2px;}
+.current-item-right{text-align:right;flex-shrink:0;}
+.current-item-amt{font-size:12px;font-weight:800;color:var(--navy);}
+.current-item-ret{font-size:11px;font-weight:700;}
+
 .r-footer{margin-top:32px;padding:0 16px 20px;font-size:10px;color:var(--slate);line-height:1.7;text-align:center;}
 
 @media print{
@@ -354,7 +383,14 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
     <!-- 포트폴리오 구성 -->
     <div class="section">
       <h2 class="sec-title">추천 포트폴리오 구성</h2>
-      <p class="sec-sub">ETF를 검색하거나 카테고리에서 선택해 포트폴리오를 직접 구성하세요.</p>
+      <p class="sec-sub">현재 보유 상품에서 유지/제외를 선택하고, 새 ETF를 추가해 변경 포트폴리오를 구성하세요.</p>
+
+      <!-- STEP 1: 현재 보유 상품 -->
+      <div class="pf-step-title">① 현재 보유 상품 (유지 / 제외 선택)</div>
+      <div class="etf-pick-list" id="current-product-list"></div>
+
+      <!-- STEP 2: ETF 추가 -->
+      <div class="pf-step-title" style="margin-top:16px;">② 새 ETF 추가</div>
       <div class="etf-search-wrap">
         <input type="text" id="etf-search-input" placeholder="🔍 ETF 검색 (예: S&amp;P500, 나스닥, 반도체...)" oninput="filterEtf()" autocomplete="off"/>
       </div>
@@ -367,13 +403,22 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
       </div>
       <div class="etf-search-count" id="etf-search-count"></div>
       <div class="etf-pick-list" id="etf-pick-list"><div class="etf-loading">📡 ETF 목록 불러오는 중...</div></div>
+
+      <!-- STEP 3: 변경 추천 포트폴리오 -->
       <div class="portfolio-summary" id="portfolio-summary" style="display:none;">
         <div class="portfolio-summary-title">
-          <span>📋 구성된 포트폴리오</span>
+          <span>📋 변경 추천 포트폴리오</span>
           <span class="pf-total-badge" id="pf-total-pct">합계: 0%</span>
         </div>
-        <div id="portfolio-items"></div>
+        <div class="pf-section-label">▸ 유지 상품</div>
+        <div id="pf-keep-items"></div>
+        <div class="pf-section-label" id="pf-new-label" style="display:none;">▸ 새로 추가</div>
+        <div id="pf-new-items"></div>
         <div class="pf-warning" id="pf-warning" style="display:none;"></div>
+        <div class="pf-compare-box" id="pf-compare-box" style="display:none;">
+          <div class="pf-compare-title">📊 변경 전 → 후 비교</div>
+          <div id="pf-compare-content"></div>
+        </div>
       </div>
     </div>
 
@@ -452,13 +497,17 @@ addProduct('국내 채권형 펀드','국내 채권형 펀드','30');
 /* ═══════════════════════════════
    엑셀 업로드 (적립금 엑셀)
 ═══════════════════════════════ */
+// 전역 상품 데이터 저장 (리포트에서 활용)
+let currentProducts = [];
+
 function mapType(rawType){
   if(!rawType) return '혼합형 펀드';
   const t=rawType.toString().trim();
+  if(t.includes('원리금보장')) return '예금 / 원리금보장형';
+  if(t.includes('실적배당')) return '주식형 ETF';
   if(t.includes('주식형')&&(t.includes('해외')||t.includes('미국')||t.includes('글로벌')))return '해외주식형 펀드';
   if(t.includes('주식형'))return '주식형 ETF';
   if(t.includes('채권혼합')||t.includes('혼합'))return '혼합형 펀드';
-  if(t.includes('채권형')&&(t.includes('해외')||t.includes('미국')))return '혼합형 펀드';
   if(t.includes('채권형'))return '국내 채권형 펀드';
   if(t.includes('예금')||t.includes('원리금'))return '예금 / 원리금보장형';
   if(t.includes('TDF')||t.includes('tdf'))return 'TDF (Target Date Fund)';
@@ -470,55 +519,83 @@ function handleExcelUpload(input){
   const statusEl = document.getElementById('excel-status');
   if(!file) return;
 
-  // 파일 확장자 체크 (모바일에서 다른 형식 업로드 방지)
   const fileName = file.name.toLowerCase();
   if(!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')){
     statusEl.className='excel-status err'; statusEl.style.display='block';
     statusEl.textContent='❌ 엑셀 파일(.xlsx 또는 .xls)만 업로드 가능합니다.';
     return;
   }
-
   if(typeof XLSX==='undefined'){
     statusEl.className='excel-status err'; statusEl.style.display='block';
     statusEl.textContent='❌ 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.'; return;
   }
+
   const reader = new FileReader();
   reader.onload = function(e){
     try{
       const wb = XLSX.read(new Uint8Array(e.target.result),{type:'array'});
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-      let headerRow=-1;
+
+      // 헤더 행 찾기 (3행: '구분','상품명' 등이 있는 행)
+      let headerRow = -1;
       for(let i=0;i<rows.length;i++){
-        if(rows[i].some(c=>String(c).includes('상품명'))){headerRow=i;break;}
+        const r = rows[i];
+        if(String(r[0]).includes('구분') && String(r[2]).includes('상품명')){
+          headerRow = i; break;
+        }
       }
-      if(headerRow===-1) throw new Error('상품명 컬럼을 찾을 수 없습니다.');
-      const headers=rows[headerRow].map(h=>String(h).trim());
-      const ni=headers.findIndex(h=>h.includes('상품명'));
-      const ti=headers.findIndex(h=>h.includes('상품유형'));
-      const ai=headers.findIndex(h=>h.includes('적립금'));
-      const products=[];
-      let totalAmt=0;
-      for(let i=headerRow+1;i<rows.length;i++){
-        const row=rows[i];
-        const name=String(row[ni]||'').trim();
-        const type=String(row[ti]||'').trim();
-        const amt=parseFloat(String(row[ai]||'0').replace(/,/g,''))||0;
-        if(!name||name==='합계'||amt<=0) continue;
-        products.push({name,type,amt}); totalAmt+=amt;
+      // fallback: '상품명' 포함 행 탐색
+      if(headerRow === -1){
+        for(let i=0;i<rows.length;i++){
+          if(rows[i].some(c=>String(c).includes('상품명'))){headerRow=i;break;}
+        }
       }
+      if(headerRow === -1) throw new Error('헤더 행을 찾을 수 없습니다.');
+
+      // A=0,C=2,E=4,F=5,H=7,K=10,Q=16 (0-based index)
+      const COL = { A:0, C:2, E:4, F:5, H:7, K:10, Q:16 };
+
+      const products = [];
+      let totalAmt = 0;
+
+      for(let i = headerRow+1; i < rows.length; i++){
+        const row = rows[i];
+        const gubun  = String(row[COL.A] || '').trim();  // 구분
+        const name   = String(row[COL.C] || '').replace(/\u00A0/g,' ').trim(); // 상품명
+        const days   = parseInt(row[COL.E]) || 0;        // 경과일수
+        const retF   = parseFloat(row[COL.F]) || 0;      // 기간수익률(수수료전)
+        const retH   = parseFloat(row[COL.H]) || 0;      // 연환산수익률
+        const amt    = parseFloat(String(row[COL.K]||'0').replace(/,/g,'')) || 0; // 기말적립금
+        const profit = parseFloat(String(row[COL.Q]||'0').replace(/,/g,'')) || 0; // 운용수익
+
+        if(!name || !gubun || amt <= 0) continue;
+
+        products.push({ name, gubun, type: mapType(gubun), days, retF, retH, amt, profit });
+        totalAmt += amt;
+      }
+
       if(!products.length) throw new Error('유효한 상품 데이터가 없습니다.');
+
+      // 전역 저장
+      currentProducts = products;
+
+      // 기존 상품 폼 초기화
       document.getElementById('product-list').innerHTML='';
-      prodCnt=0;
-      products.forEach(p=>{
-        const pct=totalAmt>0?Math.round(p.amt/totalAmt*100):0;
-        addProduct(p.name,mapType(p.type),pct);
+      prodCnt = 0;
+      products.forEach(p => {
+        const pct = totalAmt > 0 ? Math.round(p.amt / totalAmt * 100) : 0;
+        addProduct(p.name, p.type, pct);
       });
-      const totalK=Math.round(totalAmt/1000);
-      document.getElementById('inp-amount').value=totalK.toLocaleString();
+
+      // 총 적립금 자동 입력 (원 → 천원)
+      const totalK = Math.round(totalAmt / 1000);
+      document.getElementById('inp-amount').value = totalK.toLocaleString();
+
       statusEl.className='excel-status ok'; statusEl.style.display='block';
-      statusEl.innerHTML=`✅ <strong>${products.length}개 상품</strong> 불러오기 완료 · 총 적립금 <strong>${totalK.toLocaleString()}천원</strong> 자동 입력됨`;
+      statusEl.innerHTML=`✅ <strong>${products.length}개 상품</strong> 불러오기 완료 · 총 적립금 <strong>${totalK.toLocaleString()}천원</strong>`;
       updatePctSum();
+
     }catch(err){
       statusEl.className='excel-status err'; statusEl.style.display='block';
       statusEl.textContent=`❌ 오류: ${err.message}`;
@@ -590,17 +667,31 @@ function generateReport(){
   document.getElementById('donut-label').innerHTML=`<span style="font-size:13px;font-weight:900;color:var(--navy)">${donutMsg}</span>`;
   document.getElementById('r-alloc-sub').textContent=`${products.length}개 상품 보유 · 안전자산 비중 ${safePct}%`;
 
-  /* legend - 비중% + 금액 */
+  /* legend - 새 엑셀 데이터 활용 (기말적립금, 수익률, 운용수익) */
   const totalAmtWon = amount * 1000;
-  document.getElementById('r-legend').innerHTML=products.map((p,i)=>{
-    const amtWon=totalAmtWon>0?Math.round(totalAmtWon*p.pct/100):0;
-    const amtStr=amtWon>0?(amtWon>=100000000?`${(amtWon/100000000).toFixed(1)}억원`:`${Math.round(amtWon/10000).toLocaleString()}만원`):'';
+  document.getElementById('r-legend').innerHTML = products.map((p,i) => {
+    // currentProducts에서 매칭되는 상품 찾기
+    const cp = currentProducts.find(c => c.name === p.name);
+    const amtWon = cp ? cp.amt : (totalAmtWon > 0 ? Math.round(totalAmtWon * p.pct / 100) : 0);
+    const amtStr = amtWon >= 100000000
+      ? `${(amtWon/100000000).toFixed(1)}억원`
+      : amtWon >= 10000 ? `${Math.round(amtWon/10000).toLocaleString()}만원` : '';
+    const retStr = cp ? `${cp.retF >= 0 ? '+' : ''}${(cp.retF*100).toFixed(2)}%` : '';
+    const profitStr = cp && cp.profit !== 0
+      ? (cp.profit >= 0 ? `+${Math.round(cp.profit/10000).toLocaleString()}만` : `${Math.round(cp.profit/10000).toLocaleString()}만`)
+      : '';
+    const retColor = cp && cp.retF >= 0 ? '#EF4444' : '#3B82F6';
     return `<div class="legend-item">
       <span class="legend-dot" style="background:${COLORS[i%COLORS.length]}"></span>
-      <span class="legend-name">${p.name}</span>
+      <div class="legend-name-wrap">
+        <span class="legend-name">${p.name}</span>
+        ${cp ? `<span class="legend-gubun">${cp.gubun} · ${cp.days}일</span>` : ''}
+      </div>
       <span class="legend-right">
         <span class="legend-pct">${p.pct}%</span>
-        ${amtStr?`<span class="legend-amt">${amtStr}</span>`:''}
+        ${amtStr ? `<span class="legend-amt">${amtStr}</span>` : ''}
+        ${retStr ? `<span class="legend-ret" style="color:${retColor}">${retStr}</span>` : ''}
+        ${profitStr ? `<span class="legend-profit" style="color:${retColor}">운용수익 ${profitStr}</span>` : ''}
       </span>
     </div>`;
   }).join('');
@@ -617,10 +708,12 @@ function generateReport(){
     alertEl.innerHTML=`✅ 현재 포트폴리오가 투자성향(${riskLabel})에 부합합니다. 정기적 리밸런싱으로 비중을 유지하세요.`;
   }
 
-  /* ETF 빌더 초기화 */
-  portfolio={};
+  /* 포트폴리오 빌더 초기화 */
+  portfolio = {};
+  excludedSet = new Set();
+  renderCurrentProducts();
   renderEtfList();
-  renderPortfolio();
+  updatePortfolioSummary();
 
   document.getElementById('landing').style.display='none';
   document.getElementById('report').style.display='block';
@@ -698,13 +791,52 @@ function switchTab(key){
 }
 
 /* ═══════════════════════════════
-   ETF 포트폴리오 빌더
+   ETF 포트폴리오 빌더 (현재상품 + 새 ETF)
 ═══════════════════════════════ */
 const TAG_CLASS={us:'tag-us',kr:'tag-kr',bond:'tag-bond',monthly:'tag-monthly',other:'tag-other'};
 let currentCat='all';
-let portfolio={};
+let portfolio={};       // {name: {pct, isNew, data}}
+let excludedSet=new Set(); // 제외된 현재 상품 이름
 let ETF_DB=[];
 
+/* 현재 보유 상품 렌더 */
+function renderCurrentProducts(){
+  const el = document.getElementById('current-product-list');
+  if(!el) return;
+  if(!currentProducts.length){
+    el.innerHTML=`<div class="etf-empty">엑셀 파일을 업로드하면 현재 보유 상품이 표시됩니다.</div>`;
+    return;
+  }
+  el.innerHTML = currentProducts.map(p => {
+    const excluded = excludedSet.has(p.name);
+    const amtStr = p.amt >= 100000000
+      ? `${(p.amt/100000000).toFixed(1)}억원`
+      : `${Math.round(p.amt/10000).toLocaleString()}만원`;
+    const retVal = (p.retF*100).toFixed(2);
+    const retColor = p.retF >= 0 ? '#EF4444' : '#3B82F6';
+    const retStr = `${p.retF>=0?'+':''}${retVal}%`;
+    return `<div class="current-item${excluded?' excluded':''}" onclick="toggleCurrentProduct('${p.name.replace(/'/g,"\\'")}')">
+      <div class="current-item-check">${excluded?'':'✓'}</div>
+      <div class="current-item-info">
+        <div class="current-item-name">${p.name}</div>
+        <div class="current-item-meta">${p.gubun} · ${p.days}일 보유</div>
+      </div>
+      <div class="current-item-right">
+        <div class="current-item-amt">${amtStr}</div>
+        <div class="current-item-ret" style="color:${retColor}">${retStr}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCurrentProduct(name){
+  if(excludedSet.has(name)) excludedSet.delete(name);
+  else excludedSet.add(name);
+  renderCurrentProducts();
+  updatePortfolioSummary();
+}
+
+/* ETF 목록 렌더 */
 async function loadEtfList(){
   try{
     const res=await fetch('./etf_list.json');
@@ -712,7 +844,7 @@ async function loadEtfList(){
     ETF_DB=await res.json();
     renderEtfList();
   }catch{
-    document.getElementById('etf-pick-list').innerHTML=`<div class="etf-error">ETF 목록 파일(etf_list.json)을 불러올 수 없습니다.<br>GitHub에 etf_list.json 파일이 있는지 확인하세요.</div>`;
+    document.getElementById('etf-pick-list').innerHTML=`<div class="etf-error">ETF 목록 파일(etf_list.json)을 불러올 수 없습니다.</div>`;
   }
 }
 
@@ -723,19 +855,15 @@ function renderEtfList(){
     const keyMatch=!keyword||e.name.toLowerCase().includes(keyword)||e.detail.toLowerCase().includes(keyword)||e.group2.toLowerCase().includes(keyword);
     return catMatch&&keyMatch;
   });
-
   const countEl=document.getElementById('etf-search-count');
   if(countEl) countEl.textContent=`${filtered.length}개 ETF`;
-
   const el=document.getElementById('etf-pick-list');
   if(!el) return;
   if(!filtered.length){el.innerHTML=`<div class="etf-empty">검색 결과가 없습니다.</div>`;return;}
-
-  // 최대 100개만 렌더 (성능)
   const shown=filtered.slice(0,100);
   el.innerHTML=shown.map(e=>{
     const sel=portfolio.hasOwnProperty(e.name);
-    const fmtR = (v) => v!=null ? `<span class="${v>=0?'fig-up':'fig-down'}">${v>=0?'+':''}${v}%</span>` : '<span style="color:var(--slate)">-</span>';
+    const fmtR=(v)=>v!=null?`<span class="${v>=0?'fig-up':'fig-down'}">${v>=0?'+':''}${v}%</span>`:'<span style="color:var(--slate)">-</span>';
     return `<div class="etf-pick-item${sel?' selected':''}" onclick="toggleEtf('${e.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
       <div class="etf-pick-check">${sel?'✓':''}</div>
       <div class="etf-pick-info">
@@ -750,16 +878,16 @@ function renderEtfList(){
       <span class="etf-pick-tag ${TAG_CLASS[e.cat]||'tag-other'}">${e.tag}</span>
     </div>`;
   }).join('');
-
   if(filtered.length>100){
-    el.innerHTML+=`<div class="etf-empty" style="font-size:11px;">검색어를 더 입력하면 더 많은 ETF를 볼 수 있습니다. (${filtered.length-100}개 더 있음)</div>`;
+    el.innerHTML+=`<div class="etf-empty" style="font-size:11px;">${filtered.length-100}개 더 있음 — 검색어를 입력하세요</div>`;
   }
 }
 
 function toggleEtf(name){
   if(portfolio.hasOwnProperty(name)){delete portfolio[name];}
-  else{portfolio[name]=0;redistributePct();}
-  renderEtfList();renderPortfolio();
+  else{portfolio[name]=0; redistributePct();}
+  renderEtfList();
+  updatePortfolioSummary();
 }
 
 function redistributePct(){
@@ -770,16 +898,34 @@ function redistributePct(){
   keys.forEach((k,i)=>{portfolio[k]=each+(i===0?rem:0);});
 }
 
-function renderPortfolio(){
-  const keys=Object.keys(portfolio);
-  const summaryEl=document.getElementById('portfolio-summary');
-  const itemsEl=document.getElementById('portfolio-items');
-  const warnEl=document.getElementById('pf-warning');
-  const totalEl=document.getElementById('pf-total-pct');
-  if(!keys.length){summaryEl.style.display='none';return;}
+/* 포트폴리오 통합 요약 */
+function updatePortfolioSummary(){
+  const keepProducts = currentProducts.filter(p => !excludedSet.has(p.name));
+  const newEtfs = Object.keys(portfolio);
+  const summaryEl = document.getElementById('portfolio-summary');
+  if(!summaryEl) return;
+
+  if(keepProducts.length === 0 && newEtfs.length === 0){
+    summaryEl.style.display='none'; return;
+  }
   summaryEl.style.display='block';
 
-  itemsEl.innerHTML=keys.map(name=>`
+  // 유지 상품 렌더
+  const totalKeepAmt = keepProducts.reduce((s,p)=>s+p.amt,0);
+  document.getElementById('pf-keep-items').innerHTML = keepProducts.map(p => {
+    const amtStr = p.amt >= 100000000
+      ? `${(p.amt/100000000).toFixed(1)}억원`
+      : `${Math.round(p.amt/10000).toLocaleString()}만원`;
+    return `<div class="pf-item">
+      <span class="pf-item-name">${p.name}<span style="font-size:10px;color:rgba(255,255,255,.4);margin-left:6px;">${amtStr}</span></span>
+      <span class="pf-item-unit" style="font-size:11px;color:rgba(255,255,255,.5);">유지</span>
+    </div>`;
+  }).join('') || '<div style="font-size:11px;color:rgba(255,255,255,.4);padding:6px 0;">유지 상품 없음</div>';
+
+  // 새 ETF 렌더
+  const newLabelEl = document.getElementById('pf-new-label');
+  newLabelEl.style.display = newEtfs.length ? 'block' : 'none';
+  document.getElementById('pf-new-items').innerHTML = newEtfs.map(name => `
     <div class="pf-item">
       <span class="pf-item-name">${name}</span>
       <input class="pf-item-input" type="number" min="0" max="100"
@@ -790,27 +936,57 @@ function renderPortfolio(){
       <button class="pf-item-del" onclick="removeEtf('${name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">×</button>
     </div>`).join('');
 
-  const total=keys.reduce((s,k)=>s+(parseInt(portfolio[k])||0),0);
-  totalEl.textContent=`합계: ${total}%`;
-  totalEl.className='pf-total-badge'+(total===100?' ok':total>100?' over':'');
+  // 합계 (새 ETF 비중만)
+  const total = newEtfs.reduce((s,k)=>s+(parseInt(portfolio[k])||0),0);
+  const totalEl = document.getElementById('pf-total-pct');
+  if(newEtfs.length > 0){
+    totalEl.textContent=`새 ETF 합계: ${total}%`;
+    totalEl.className='pf-total-badge'+(total===100?' ok':total>100?' over':'');
+    const warnEl=document.getElementById('pf-warning');
+    if(total!==100 && total>0){
+      warnEl.style.display='block';
+      warnEl.textContent=total>100?`⚠ 새 ETF 합계가 ${total}%입니다. 100%로 조정해주세요.`:`⚠ 새 ETF 합계가 ${total}%입니다. ${100-total}% 추가 배분이 필요합니다.`;
+    } else { document.getElementById('pf-warning').style.display='none'; }
+  } else {
+    totalEl.textContent='새 ETF 없음';
+    totalEl.className='pf-total-badge';
+    document.getElementById('pf-warning').style.display='none';
+  }
 
-  if(total!==100){
-    warnEl.style.display='block';
-    warnEl.textContent=total>100
-      ?`⚠ 합계가 ${total}%입니다. 100%가 되도록 조정해주세요.`
-      :`⚠ 합계가 ${total}%입니다. ${100-total}%를 추가 배분해주세요.`;
-  }else{warnEl.style.display='none';}
+  // 변경 전→후 비교
+  const compareBox = document.getElementById('pf-compare-box');
+  const compareContent = document.getElementById('pf-compare-content');
+  if(currentProducts.length > 0){
+    compareBox.style.display='block';
+    const rows = [];
+    currentProducts.forEach(p => {
+      const isExcluded = excludedSet.has(p.name);
+      rows.push(`<div class="pf-compare-row">
+        <span class="pf-compare-name">${p.name}</span>
+        <span class="pf-compare-badge ${isExcluded?'badge-remove':'badge-keep'}">${isExcluded?'제외':'유지'}</span>
+      </div>`);
+    });
+    newEtfs.forEach(name => {
+      rows.push(`<div class="pf-compare-row">
+        <span class="pf-compare-name">${name}</span>
+        <span class="pf-compare-badge badge-add">신규 ${portfolio[name]}%</span>
+      </div>`);
+    });
+    compareContent.innerHTML = rows.join('');
+  } else {
+    compareBox.style.display='none';
+  }
 }
 
-function updatePfPct(name,val){portfolio[name]=parseInt(val)||0;renderPortfolio();}
-function removeEtf(name){delete portfolio[name];renderEtfList();renderPortfolio();}
+function updatePfPct(name,val){ portfolio[name]=parseInt(val)||0; updatePortfolioSummary(); }
+function removeEtf(name){ delete portfolio[name]; renderEtfList(); updatePortfolioSummary(); }
 function setCat(cat,btn){
   currentCat=cat;
   document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
   if(btn)btn.classList.add('active');
   renderEtfList();
 }
-function filterEtf(){renderEtfList();}
+function filterEtf(){ renderEtfList(); }
 
 // 페이지 로드 완료
 document.addEventListener('DOMContentLoaded', ()=>{ updatePctSum(); });
