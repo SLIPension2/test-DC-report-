@@ -787,10 +787,10 @@ function generateReport(){
       ? `${(amtWon/100000000).toFixed(1)}억원`
       : amtWon >= 10000 ? `${Math.round(amtWon/10000).toLocaleString()}만원` : '';
     const retPct = cp ? (cp.retF*100).toFixed(2) : null;
-    const retStr = retPct != null ? `수익률 ${cp.retF>=0?'+':''}${retPct}%` : '';
+    const retStr = retPct != null ? `${cp.retF>=0?'+':''}${retPct}%` : '';
     const profitAmt = cp && cp.profit !== 0 ? cp.profit : null;
     const profitStr = profitAmt != null
-      ? `운용수익 ${profitAmt>=0?'+':''}${Math.round(profitAmt/10000).toLocaleString()}만`
+      ? `${profitAmt>=0?'+':''}${Math.round(profitAmt/10000).toLocaleString()}만`
       : '';
     const retColor = cp && cp.retF >= 0 ? '#EF4444' : '#3B82F6';
     return `<div class="legend-item">
