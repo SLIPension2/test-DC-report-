@@ -153,7 +153,9 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 .etf-pick-info{flex:1;min-width:0;}
 .etf-pick-name{font-size:13px;font-weight:800;color:var(--text);}
 .etf-pick-meta{font-size:10px;color:var(--slate);margin-top:1px;}
-.etf-pick-returns{text-align:right;flex-shrink:0;}
+.etf-pick-returns{display:flex;flex-direction:column;gap:2px;flex-shrink:0;text-align:right;}
+.etf-returns-row{display:flex;align-items:center;gap:4px;justify-content:flex-end;}
+.etf-rlabel{font-size:9px;color:var(--slate);font-weight:700;width:16px;}
 .etf-pick-r1y{font-size:12px;font-weight:800;}
 .etf-pick-rlabel{font-size:10px;color:var(--slate);}
 .etf-pick-tag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;flex-shrink:0;}
@@ -719,14 +721,18 @@ function renderEtfList(){
   const shown=filtered.slice(0,100);
   el.innerHTML=shown.map(e=>{
     const sel=portfolio.hasOwnProperty(e.name);
-    const r1y=e.r1y!=null?`<span class="${e.r1y>=0?'fig-up':'fig-down'}">${e.r1y>=0?'+':''}${e.r1y}%</span>`:'';
+    const fmtR = (v) => v!=null ? `<span class="${v>=0?'fig-up':'fig-down'}">${v>=0?'+':''}${v}%</span>` : '<span style="color:var(--slate)">-</span>';
     return `<div class="etf-pick-item${sel?' selected':''}" onclick="toggleEtf('${e.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
       <div class="etf-pick-check">${sel?'✓':''}</div>
       <div class="etf-pick-info">
         <div class="etf-pick-name">${e.name}</div>
         <div class="etf-pick-meta">${e.detail}</div>
       </div>
-      ${r1y?`<div class="etf-pick-returns"><div class="etf-pick-r1y">${r1y}</div><div class="etf-pick-rlabel">1년수익</div></div>`:''}
+      <div class="etf-pick-returns">
+        <div class="etf-returns-row"><span class="etf-rlabel">1M</span>${fmtR(e.r1m)}</div>
+        <div class="etf-returns-row"><span class="etf-rlabel">3M</span>${fmtR(e.r3m)}</div>
+        <div class="etf-returns-row"><span class="etf-rlabel">6M</span>${fmtR(e.r6m)}</div>
+      </div>
       <span class="etf-pick-tag ${TAG_CLASS[e.cat]||'tag-other'}">${e.tag}</span>
     </div>`;
   }).join('');
