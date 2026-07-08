@@ -388,7 +388,7 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 <div id="landing">
   <p class="brand">SAMSUNG LIFE INSURANCE · DC PENSION</p>
   <h1 class="landing-title">퇴직연금 DC<br>투자분석 리포트</h1>
-  <p class="landing-sub">가입자 정보를 입력하면<br>맞춤형 분석 리포트를 즉시 생성합니다.</p>
+
 
   <div class="form-card">
     <p class="form-section-title">기본 정보</p>
@@ -398,8 +398,8 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
         <input type="text" id="inp-name" placeholder="예: 김삼성" value="김삼성"/>
       </div>
       <div class="form-group">
-        <label>총 적립금 (천원)</label>
-        <input type="text" id="inp-amount" placeholder="예: 54,200" value="54,200" inputmode="numeric"/>
+        <label>총 적립금</label>
+        <input type="text" id="inp-amount" placeholder="예: 54,200 (천원 단위)" value="54,200" inputmode="numeric"/>
       </div>
       <div class="form-group">
         <label>투자성향</label>
@@ -786,7 +786,7 @@ function handleExcelUpload(input){
       document.getElementById('inp-amount').value = totalK.toLocaleString();
 
       statusEl.className='excel-status ok'; statusEl.style.display='block';
-      statusEl.innerHTML=`✅ <strong>${products.length}개 상품</strong> 불러오기 완료 · 총 적립금 <strong>${totalK.toLocaleString()}천원</strong>`;
+      statusEl.innerHTML=`✅ <strong>${products.length}개 상품</strong> 불러오기 완료 · 총 적립금 <strong>${Math.round(totalK/10).toLocaleString()}만원</strong>`;
       updatePctSum();
 
     }catch(err){
@@ -882,12 +882,12 @@ function generateReport(){
 
   document.getElementById('r-kpi').innerHTML=[
     {l:'투자성향', v:riskLabel},
-    {l:'총 적립금', v:amount?`${amount.toLocaleString()}천원`:'미입력'},
+    {l:'총 적립금', v:amount?`${Math.round(amount/10).toLocaleString()}만원`:'미입력'},
     {l:'보유 상품 수', v:`${products.length}개`},
   ].map(k=>`<div class="kpi-card"><p class="kpi-label">${k.l}</p><p class="kpi-value">${k.v}</p></div>`).join('');
 
   document.getElementById('donut-svg').innerHTML = buildDonutByGubun();
-  document.getElementById('r-alloc-sub').textContent=`${products.length}개 상품 보유 · 총 적립금 ${amount ? amount.toLocaleString()+'천원' : '미입력'}`;
+  document.getElementById('r-alloc-sub').textContent=`${products.length}개 상품 보유 · 총 적립금 ${amount ? Math.round(amount/10).toLocaleString()+'만원' : '미입력'}`;
 
   /* legend - 상품별 상세 */
   const totalAmtWon = amount * 1000;
@@ -1121,11 +1121,15 @@ let portfolio={};
 let excludedSet=new Set();
 let ETF_DB=[];
 
-// 금액 통일: 만원 단위, 소수점 1자리 (83.2만원)
+// 금액 통일: 만원 단위, 콤마 포함 (1,810만원)
 function fmtAmt(won){
   if(!won || won===0) return '0만원';
-  if(won>=100000000) return `${(won/100000000).toFixed(1)}억원`;
-  return `${(won/10000).toFixed(1)}만원`;
+  if(won>=100000000){
+    const uk = won/100000000;
+    return uk % 1 === 0 ? `${uk.toLocaleString()}억원` : `${uk.toFixed(1)}억원`;
+  }
+  const man = Math.round(won/10000);
+  return `${man.toLocaleString()}만원`;
 }
 
 // 총 자산 대비 비중 (%)
