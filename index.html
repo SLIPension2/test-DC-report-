@@ -327,6 +327,7 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 .after-item-name{flex:1;font-size:12px;font-weight:700;color:var(--text);}
 .after-item-right{text-align:right;flex-shrink:0;}
 .after-item-amt{font-size:12px;font-weight:800;color:var(--navy);}
+.after-item-weight{font-size:10px;color:var(--slate);font-weight:600;margin-left:3px;}
 .after-item-pct-input{width:60px;padding:5px 7px;border-radius:7px;border:1.5px solid var(--blue-light);background:var(--white);font-size:13px;font-weight:800;color:var(--blue);text-align:center;font-family:inherit;}
 .budget-remain{margin:12px 14px;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:700;background:#FFF8E1;color:#92400E;border:1px solid #FDE68A;}
 
@@ -989,10 +990,18 @@ let portfolio={};
 let excludedSet=new Set();
 let ETF_DB=[];
 
+// 금액 통일: 만원 단위, 소수점 1자리 (83.2만원)
 function fmtAmt(won){
+  if(!won || won===0) return '0만원';
   if(won>=100000000) return `${(won/100000000).toFixed(1)}억원`;
-  if(won>=10000) return `${Math.round(won/10000).toLocaleString()}만원`;
-  return `${won.toLocaleString()}원`;
+  return `${(won/10000).toFixed(1)}만원`;
+}
+
+// 총 자산 대비 비중 (%)
+function fmtPct(won, totalWon){
+  if(!totalWon || totalWon===0) return '';
+  const pct = (won/totalWon*100);
+  return pct < 0.1 ? '0.1%미만' : `${pct.toFixed(1)}%`;
 }
 
 function renderCurrentProducts(){
@@ -1042,69 +1051,114 @@ function toggleExclude(name){
 function updateBudget(){
   const removedAmt = currentProducts.filter(p=>excludedSet.has(p.name)).reduce((s,p)=>s+p.amt,0);
   const totalAmt   = currentProducts.reduce((s,p)=>s+p.amt,0);
-  const usedAmt    = Object.values(portfolio).reduce((s,v)=>s+v,0);
-  const remainAmt  = removedAmt - usedAmt;
+  const usedPct    = Object.values(portfolio).reduce((s,v)=>s+(parseFloat(v)||0),0);
+  const remainPct  = 100 - usedPct;
   document.getElementById('budget-amount').textContent = fmtAmt(removedAmt);
   const fillPct = totalAmt > 0 ? Math.min((removedAmt/totalAmt)*100, 100) : 0;
   document.getElementById('budget-fill').style.width = `${fillPct}%`;
   if(removedAmt===0) document.getElementById('budget-sub').textContent='제외 상품을 선택하면 매수가능금액이 생깁니다';
-  else if(remainAmt>0) document.getElementById('budget-sub').textContent=`미배분 ${fmtAmt(remainAmt)} 남음`;
-  else if(remainAmt<0) document.getElementById('budget-sub').textContent=`⚠ 배분 초과 ${fmtAmt(Math.abs(remainAmt))}`;
+  else if(usedPct===0) document.getElementById('budget-sub').textContent='신규 ETF에 비율(%)을 입력해 배분하세요';
+  else if(remainPct>0){ const rA=removedAmt*remainPct/100; document.getElementById('budget-sub').textContent=`미배분 ${fmtAmt(rA)} (${remainPct.toFixed(0)}% 남음)`; }
+  else if(remainPct<0) document.getElementById('budget-sub').textContent=`⚠ 비율 합계가 100%를 초과했습니다`;
   else document.getElementById('budget-sub').textContent=`✅ 전액 배분 완료`;
-  return {removedAmt, usedAmt, remainAmt};
+  return {removedAmt, usedPct, remainPct};
 }
 
 function renderAfterPortfolio(){
   const keepList = currentProducts.filter(p=>!excludedSet.has(p.name));
-  const newNames = Object.keys(portfolio);
+  const newNames = Object.keys(portfolio); // {name: 비율(0~100)}
   const afterEl  = document.getElementById('after-portfolio');
   const listEl   = document.getElementById('list-after');
   const addCount = document.getElementById('add-count');
   if(addCount) addCount.textContent=`${newNames.length}개`;
   if(keepList.length===0&&newNames.length===0){afterEl.style.display='none';return;}
   afterEl.style.display='block';
-  const {removedAmt,usedAmt,remainAmt} = updateBudget();
-  let html='';
+
+  const {removedAmt, usedPct, remainPct} = updateBudget();
+
+  // 총 자산 = 유지 상품 합계 + 신규 배분 금액
+  const keepTotal  = keepList.reduce((s,p)=>s+p.amt, 0);
+  const newTotal   = newNames.reduce((s,k)=>s+(removedAmt*(portfolio[k]||0)/100), 0);
+  const grandTotal = keepTotal + newTotal;
+
+  let html = '';
+
+  // 유지 상품
   keepList.forEach(p=>{
+    const pctStr = grandTotal>0 ? `(${fmtPct(p.amt, grandTotal)})` : '';
     html+=`<div class="after-item">
       <span class="after-item-type type-keep">유지</span>
       <span class="after-item-name">${p.name}</span>
-      <div class="after-item-right"><div class="after-item-amt">${fmtAmt(p.amt)}</div></div>
+      <div class="after-item-right">
+        <span class="after-item-amt">${fmtAmt(p.amt)}</span>
+        ${pctStr?`<span class="after-item-weight">${pctStr}</span>`:''}
+      </div>
     </div>`;
   });
+
+  // 신규 ETF - 비율(%) 입력, 오른쪽에 계산된 금액 표시
   newNames.forEach(name=>{
-    const amt=portfolio[name]||0;
+    const ratio = portfolio[name] || 0;
+    const calcAmt = removedAmt > 0 ? removedAmt * ratio / 100 : 0;
+    const pctStr  = grandTotal>0 && calcAmt>0 ? `(${fmtPct(calcAmt, grandTotal)})` : '';
+    const safeName = name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
     html+=`<div class="after-item">
       <span class="after-item-type type-add">신규</span>
       <span class="after-item-name">${name}</span>
       <div class="after-item-right" style="display:flex;align-items:center;gap:6px;">
-        <input class="after-item-pct-input" type="number" min="0"
-          value="${Math.round(amt/10000)}"
-          onchange="updateNewAmt('${name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}',this.value)"
-          inputmode="numeric" placeholder="만원"/>
-        <span style="font-size:11px;color:var(--slate);">만원</span>
-        <button class="pf-item-del" onclick="removeNewEtf('${name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">×</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+          <div style="display:flex;align-items:center;gap:4px;">
+            <input class="after-item-pct-input" type="number" min="0" max="100"
+              value="${ratio}"
+              onchange="updateNewRatio('${safeName}',this.value)"
+              inputmode="numeric" placeholder="0"/>
+            <span style="font-size:11px;color:var(--slate);font-weight:700;">%</span>
+          </div>
+          ${calcAmt>0?`<span style="font-size:10px;color:var(--blue);font-weight:700;">${fmtAmt(calcAmt)} ${pctStr}</span>`:'<span style="font-size:10px;color:var(--slate);">비율 입력</span>'}
+        </div>
+        <button class="pf-item-del" onclick="removeNewEtf('${safeName}')">×</button>
       </div>
     </div>`;
   });
-  listEl.innerHTML=html||`<div style="padding:12px 14px;font-size:12px;color:var(--slate);">상품을 구성하세요.</div>`;
-  const totalEl=document.getElementById('pf-total-pct');
-  const warnEl=document.getElementById('pf-warning');
-  const remEl=document.getElementById('budget-remain');
-  if(newNames.length>0&&removedAmt>0){
-    const pct=Math.round(usedAmt/removedAmt*100);
-    totalEl.textContent=`매수가능금액의 ${pct}% 배분`;
-    totalEl.className='pf-total-badge'+(pct>=100?' ok':'');
-    if(remainAmt>0){remEl.style.display='block';remEl.textContent=`💡 미배분 ${fmtAmt(remainAmt)} — 추가 ETF를 선택하거나 금액을 늘려주세요.`;warnEl.style.display='none';}
-    else if(remainAmt<0){remEl.style.display='none';warnEl.style.display='block';warnEl.textContent=`⚠ 배분 금액이 매수가능금액보다 ${fmtAmt(Math.abs(remainAmt))} 초과했습니다.`;}
-    else{remEl.style.display='none';warnEl.style.display='none';}
+
+  listEl.innerHTML = html || `<div style="padding:12px 14px;font-size:12px;color:var(--slate);">상품을 구성하세요.</div>`;
+
+  // 배분 상태 표시
+  const totalEl = document.getElementById('pf-total-pct');
+  const warnEl  = document.getElementById('pf-warning');
+  const remEl   = document.getElementById('budget-remain');
+
+  if(newNames.length>0 && removedAmt>0){
+    totalEl.textContent = `매수가능금액의 ${usedPct.toFixed(0)}% 배분`;
+    totalEl.className   = 'pf-total-badge'+(usedPct>=100?' ok':'');
+    if(remainPct>0){
+      const remainAmt = removedAmt * remainPct / 100;
+      remEl.style.display='block';
+      remEl.textContent=`💡 미배분 ${fmtAmt(remainAmt)} (${remainPct.toFixed(0)}%) — 비율을 추가 입력해주세요.`;
+      warnEl.style.display='none';
+    } else if(remainPct<0){
+      const overAmt = removedAmt * Math.abs(remainPct) / 100;
+      remEl.style.display='none';
+      warnEl.style.display='block';
+      warnEl.textContent=`⚠ 배분 비율 합계가 100%를 ${Math.abs(remainPct).toFixed(0)}% 초과했습니다. (${fmtAmt(overAmt)} 초과)`;
+    } else {
+      remEl.style.display='none';
+      warnEl.style.display='none';
+    }
+  } else if(newNames.length>0 && removedAmt===0){
+    totalEl.textContent='제외 상품을 먼저 선택하세요';
+    totalEl.className='pf-total-badge';
+    warnEl.style.display='none';
+    remEl.style.display='none';
   } else {
-    totalEl.textContent='금액 미입력';totalEl.className='pf-total-badge';
-    warnEl.style.display='none';remEl.style.display='none';
+    totalEl.textContent='신규 ETF 없음';
+    totalEl.className='pf-total-badge';
+    warnEl.style.display='none';
+    remEl.style.display='none';
   }
 }
 
-function updateNewAmt(name,val){portfolio[name]=(parseInt(val)||0)*10000;updateBudget();renderAfterPortfolio();}
+function updateNewRatio(name,val){portfolio[name]=parseFloat(val)||0;updateBudget();renderAfterPortfolio();}
 function removeNewEtf(name){delete portfolio[name];renderEtfList();renderAfterPortfolio();}
 
 async function loadEtfList(){
@@ -1159,9 +1213,11 @@ function renderEtfList(){
 function toggleEtf(name){
   if(portfolio.hasOwnProperty(name)){delete portfolio[name];}
   else{
-    const removedAmt=currentProducts.filter(p=>excludedSet.has(p.name)).reduce((s,p)=>s+p.amt,0);
-    const newCount=Object.keys(portfolio).length+1;
-    portfolio[name]=newCount>0&&removedAmt>0?Math.round(removedAmt/newCount/10000)*10000:0;
+    portfolio[name]=0;
+    // 균등 배분 제안
+    const keys=Object.keys(portfolio);
+    const each=parseFloat((100/keys.length).toFixed(1));
+    keys.forEach((k,i)=>{ portfolio[k]=i===keys.length-1?parseFloat((100-(each*(keys.length-1))).toFixed(1)):each; });
   }
   renderEtfList();
   renderAfterPortfolio();
