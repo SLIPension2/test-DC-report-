@@ -973,9 +973,38 @@ document.addEventListener('click', e=>{
   if(!e.target.closest('.export-wrap')) closeExportMenu();
 });
 
+/* ── 카카오톡 인앱 브라우저 감지 ── */
+function isKakaoTalk(){
+  return /KAKAOTALK/i.test(navigator.userAgent);
+}
+
 /* ── PDF 저장 ── */
 function exportPDF(){
   closeExportMenu();
+
+  // 카카오톡 인앱 브라우저 감지
+  if(isKakaoTalk()){
+    const url = location.href;
+    // 안드로이드: intent scheme으로 기본 브라우저에서 열기
+    const intentUrl = 'intent://' + url.replace(/https?:\/\//, '') + '#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end';
+    if(confirm('카카오톡 브라우저에서는 PDF 저장이 제한됩니다.\n\n외부 브라우저(크롬, 삼성 인터넷 등)로 열어서 저장해주세요.\n\n지금 외부 브라우저로 이동할까요?')){
+      // intent 방식 시도 → 실패하면 주소 복사 안내
+      try {
+        location.href = intentUrl;
+      } catch(e) {
+        // 복사 후 안내
+        if(navigator.clipboard){
+          navigator.clipboard.writeText(url).then(()=>{
+            alert('주소가 복사됐습니다!\n브라우저 앱을 열고 주소창에 붙여넣기 해주세요.\n\n' + url);
+          });
+        } else {
+          alert('브라우저 앱을 열고 아래 주소를 입력해주세요:\n\n' + url);
+        }
+      }
+    }
+    return;
+  }
+
   if(typeof html2pdf === 'undefined'){
     alert('PDF 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');
     return;
