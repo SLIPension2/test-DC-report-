@@ -5,16 +5,19 @@ on:
     - cron: '0 22 * * 1-5'  # 평일 오전 7시 KST (UTC 22시)
   workflow_dispatch:          # 수동 실행도 가능
 
+permissions:
+  contents: write             # ← Git push 권한 추가 (핵심)
+
 jobs:
   update-etf-data:
     runs-on: ubuntu-latest
 
     steps:
       - name: 저장소 체크아웃
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4      # v3 → v4 업그레이드
 
       - name: Python 설치
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5  # v4 → v5 업그레이드
         with:
           python-version: '3.11'
 
