@@ -184,6 +184,69 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 .etf-empty{text-align:center;padding:24px;color:var(--slate);font-size:13px;}
 .etf-search-count{font-size:11px;color:var(--slate);margin-bottom:8px;padding-left:2px;}
 
+/* 구성종목 버튼 */
+.holdings-btn{
+  font-size:10px;font-weight:800;
+  padding:3px 7px;border-radius:6px;
+  border:1.5px solid var(--blue-mid);
+  background:var(--white);color:var(--blue);
+  cursor:pointer;font-family:inherit;
+  transition:all .15s;white-space:nowrap;
+}
+.holdings-btn:hover{background:var(--blue);color:var(--white);}
+
+/* 구성종목 팝업 */
+#holdings-modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.5);
+  z-index:999;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.modal-box{
+  background:var(--white);
+  border-radius:20px;
+  width:100%;max-width:480px;
+  max-height:80vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 24px 80px rgba(0,0,0,.3);
+}
+.modal-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:20px 20px 16px;
+  border-bottom:1px solid var(--line);
+  flex-shrink:0;
+}
+.modal-title{font-size:15px;font-weight:900;color:var(--navy);}
+.modal-sub{font-size:11px;color:var(--slate);margin-top:3px;}
+.modal-close{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--smoke);border:none;
+  color:var(--slate);font-size:14px;
+  cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-body{overflow-y:auto;padding:16px 20px;}
+.holding-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 0;border-bottom:1px solid var(--line);
+}
+.holding-item:last-child{border-bottom:none;}
+.holding-rank{
+  width:22px;height:22px;border-radius:6px;
+  background:var(--blue-light);color:var(--blue);
+  font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.holding-name{flex:1;font-size:13px;font-weight:600;color:var(--text);}
+.holding-bar-wrap{width:80px;flex-shrink:0;}
+.holding-bar-track{height:6px;background:var(--smoke);border-radius:99px;overflow:hidden;margin-bottom:2px;}
+.holding-bar-fill{height:100%;background:var(--blue);border-radius:99px;}
+.holding-weight{font-size:11px;font-weight:800;color:var(--blue);text-align:right;}
+.modal-loading{text-align:center;padding:32px;color:var(--slate);font-size:13px;}
+.modal-error{text-align:center;padding:24px;color:var(--red);font-size:12px;background:#FEF2F2;border-radius:10px;}
+
 .legend-name-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
 .legend-name{font-weight:600;color:var(--text);font-size:12px;}
 .legend-gubun{font-size:10px;color:var(--slate);}
@@ -1071,18 +1134,23 @@ function renderEtfList(){
   const fmtR=(v)=>v!=null?`<span class="${v>=0?'fig-up':'fig-down'}">${v>=0?'+':''}${v}%</span>`:'<span style="color:var(--slate)">-</span>';
   el.innerHTML=shown.map(e=>{
     const sel=portfolio.hasOwnProperty(e.name);
-    return `<div class="etf-pick-item${sel?' selected':''}" onclick="toggleEtf('${e.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
-      <div class="etf-pick-check">${sel?'✓':''}</div>
-      <div class="etf-pick-info">
+    const safeCode = (e.code||'').replace(/'/g,"\\'");
+    const safeName = e.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    return `<div class="etf-pick-item${sel?' selected':''}">
+      <div class="etf-pick-check" onclick="toggleEtf('${safeName}')">${sel?'✓':''}</div>
+      <div class="etf-pick-info" onclick="toggleEtf('${safeName}')">
         <div class="etf-pick-name">${e.name}</div>
         <div class="etf-pick-meta">${e.detail}</div>
       </div>
-      <div class="etf-pick-returns">
+      <div class="etf-pick-returns" onclick="toggleEtf('${safeName}')">
         <div class="etf-returns-row"><span class="etf-rlabel">1M</span>${fmtR(e.r1m)}</div>
         <div class="etf-returns-row"><span class="etf-rlabel">3M</span>${fmtR(e.r3m)}</div>
         <div class="etf-returns-row"><span class="etf-rlabel">6M</span>${fmtR(e.r6m)}</div>
       </div>
-      <span class="etf-pick-tag ${TAG_CLASS[e.cat]||'tag-other'}">${e.tag}</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+        <span class="etf-pick-tag ${TAG_CLASS[e.cat]||'tag-other'}" onclick="toggleEtf('${safeName}')">${e.tag}</span>
+        <button class="holdings-btn" onclick="event.stopPropagation();showHoldings('${safeCode}','${safeName}')">구성</button>
+      </div>
     </div>`;
   }).join('');
   if(filtered.length>100) el.innerHTML+=`<div class="etf-empty" style="font-size:11px;">${filtered.length-100}개 더 있음</div>`;
@@ -1099,6 +1167,73 @@ function toggleEtf(name){
   renderAfterPortfolio();
 }
 
+/* ── 구성종목 팝업 ── */
+let holdingsData = null;
+
+async function loadHoldingsData(){
+  if(holdingsData) return holdingsData;
+  try{
+    const res = await fetch('./etf_holdings.json');
+    if(!res.ok) throw new Error('파일 없음');
+    holdingsData = await res.json();
+    return holdingsData;
+  }catch{
+    return null;
+  }
+}
+
+async function showHoldings(code, name){
+  const modal   = document.getElementById('holdings-modal');
+  const titleEl = document.getElementById('modal-title');
+  const subEl   = document.getElementById('modal-sub');
+  const bodyEl  = document.getElementById('modal-body');
+
+  titleEl.textContent = name;
+  subEl.textContent   = '구성종목 불러오는 중...';
+  bodyEl.innerHTML    = '<div class="modal-loading">📡 데이터 불러오는 중...</div>';
+  modal.style.display = 'flex';
+
+  const data = await loadHoldingsData();
+
+  if(!data){
+    subEl.textContent = '데이터 없음';
+    bodyEl.innerHTML  = `<div class="modal-error">
+      etf_holdings.json 파일이 없습니다.<br>
+      GitHub Actions에서 <strong>월별 ETF 구성종목 업데이트</strong>를 먼저 실행해주세요.<br><br>
+      <a href="https://www.krx.co.kr" target="_blank" style="color:var(--blue);font-weight:700;">KRX에서 직접 확인하기 →</a>
+    </div>`;
+    return;
+  }
+
+  const items = data.holdings?.[code];
+  subEl.textContent = `기준일: ${data.updated||''} · 상위 20개 구성종목`;
+
+  if(!items || items.length === 0){
+    bodyEl.innerHTML = `<div class="modal-error">
+      이 ETF의 구성종목 데이터가 없습니다.<br>
+      <a href="https://www.krx.co.kr" target="_blank" style="color:var(--blue);font-weight:700;">KRX에서 직접 확인하기 →</a>
+    </div>`;
+    return;
+  }
+
+  const maxWeight = items[0]?.weight || 1;
+  bodyEl.innerHTML = items.map((item, i) => `
+    <div class="holding-item">
+      <span class="holding-rank">${i+1}</span>
+      <span class="holding-name">${item.name}</span>
+      <div class="holding-bar-wrap">
+        <div class="holding-bar-track">
+          <div class="holding-bar-fill" style="width:${(item.weight/maxWeight*100).toFixed(0)}%"></div>
+        </div>
+        <div class="holding-weight">${item.weight}%</div>
+      </div>
+    </div>`).join('');
+}
+
+function closeHoldings(){
+  document.getElementById('holdings-modal').style.display='none';
+}
+
 function setCat(cat,btn){
   currentCat=cat;
   document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
@@ -1109,5 +1244,19 @@ function filterEtf(){ renderEtfList(); }
 
 document.addEventListener('DOMContentLoaded', ()=>{ updatePctSum(); });
 </script>
+<!-- ══════════ 구성종목 팝업 ══════════ -->
+<div id="holdings-modal" style="display:none;" onclick="if(event.target===this)closeHoldings()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-sub" id="modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeHoldings()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
 </body>
 </html>
