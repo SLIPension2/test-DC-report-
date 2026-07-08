@@ -1,0 +1,37 @@
+name: 월별 ETF 구성종목 업데이트
+
+on:
+  schedule:
+    - cron: '0 22 1 * *'   # 매월 1일 오전 7시 KST (UTC 22시)
+  workflow_dispatch:         # 수동 실행 가능
+
+permissions:
+  contents: write
+
+jobs:
+  update-holdings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120     # 최대 2시간 (934개 수집에 시간 필요)
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: pykrx 설치
+        run: pip install pykrx pandas
+
+      - name: ETF 구성종목 수집
+        run: python fetch_holdings.py
+
+      - name: 변경사항 커밋 & 푸시
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add etf_holdings.json
+          git diff --staged --quiet || git commit -m "📦 ETF 구성종목 월별 업데이트 $(date '+%Y-%m')"
+          git push
