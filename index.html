@@ -1149,7 +1149,7 @@ function renderEtfList(){
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
         <span class="etf-pick-tag ${TAG_CLASS[e.cat]||'tag-other'}" onclick="toggleEtf('${safeName}')">${e.tag}</span>
-        <button class="holdings-btn" onclick="event.stopPropagation();showHoldings('${safeCode}','${safeName}')">구성</button>
+        <button class="holdings-btn" onclick="event.stopPropagation();showHoldings('${safeCode}','${safeName}')" title="네이버 금융에서 구성종목 보기">🔍 구성</button>
       </div>
     </div>`;
   }).join('');
@@ -1183,51 +1183,12 @@ async function loadHoldingsData(){
 }
 
 async function showHoldings(code, name){
-  const modal   = document.getElementById('holdings-modal');
-  const titleEl = document.getElementById('modal-title');
-  const subEl   = document.getElementById('modal-sub');
-  const bodyEl  = document.getElementById('modal-body');
-
-  titleEl.textContent = name;
-  subEl.textContent   = '구성종목 불러오는 중...';
-  bodyEl.innerHTML    = '<div class="modal-loading">📡 데이터 불러오는 중...</div>';
-  modal.style.display = 'flex';
-
-  const data = await loadHoldingsData();
-
-  if(!data){
-    subEl.textContent = '데이터 없음';
-    bodyEl.innerHTML  = `<div class="modal-error">
-      etf_holdings.json 파일이 없습니다.<br>
-      GitHub Actions에서 <strong>월별 ETF 구성종목 업데이트</strong>를 먼저 실행해주세요.<br><br>
-      <a href="https://www.krx.co.kr" target="_blank" style="color:var(--blue);font-weight:700;">KRX에서 직접 확인하기 →</a>
-    </div>`;
-    return;
+  // 네이버 금융 ETF 상세 페이지로 바로 이동
+  if(code){
+    window.open(`https://finance.naver.com/item/main.naver?code=${code}`, '_blank');
+  } else {
+    window.open(`https://finance.naver.com/fund/etfItemList.naver`, '_blank');
   }
-
-  const items = data.holdings?.[code];
-  subEl.textContent = `기준일: ${data.updated||''} · 상위 20개 구성종목`;
-
-  if(!items || items.length === 0){
-    bodyEl.innerHTML = `<div class="modal-error">
-      이 ETF의 구성종목 데이터가 없습니다.<br>
-      <a href="https://www.krx.co.kr" target="_blank" style="color:var(--blue);font-weight:700;">KRX에서 직접 확인하기 →</a>
-    </div>`;
-    return;
-  }
-
-  const maxWeight = items[0]?.weight || 1;
-  bodyEl.innerHTML = items.map((item, i) => `
-    <div class="holding-item">
-      <span class="holding-rank">${i+1}</span>
-      <span class="holding-name">${item.name}</span>
-      <div class="holding-bar-wrap">
-        <div class="holding-bar-track">
-          <div class="holding-bar-fill" style="width:${(item.weight/maxWeight*100).toFixed(0)}%"></div>
-        </div>
-        <div class="holding-weight">${item.weight}%</div>
-      </div>
-    </div>`).join('');
 }
 
 function closeHoldings(){
