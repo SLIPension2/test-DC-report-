@@ -396,11 +396,99 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 .empno-hint{margin-top:16px;font-size:11px;color:var(--slate);text-align:center;line-height:1.7;}
 
 @media print{
-  #empno-screen{display:none!important;}
-  #landing{display:none!important;}
-  #report{display:block!important;}
-  .r-topbar{position:static;}
-  .btn-back,.btn-print{display:none;}
+  /* ── 기본 설정 ── */
+  *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  @page{ size:A4 portrait; margin:12mm 14mm; }
+
+  /* 숨길 요소 */
+  #empno-screen, #landing, .r-topbar, .btn-back, .btn-print,
+  .export-wrap, .etf-rank-tabs, #panel-return, .budget-bar,
+  .pf-step-box:has(.pf-step-header.add), .pf-step-box:has(.pf-step-header.remove),
+  .r-footer, .holdings-btn, .export-loading,
+  #holdings-modal { display:none !important; }
+
+  /* 리포트 표시 */
+  #report { display:block !important; padding:0; }
+  body { background:white; font-size:11pt; }
+
+  /* hero 섹션 */
+  .r-hero {
+    background:linear-gradient(160deg,#0033CC 0%,#0055FF 100%) !important;
+    padding:16px 20px 20px;
+    border-radius:0;
+    margin-bottom:12px;
+  }
+  .r-eyebrow { font-size:8pt; margin-bottom:4px; }
+  .r-hero-name { font-size:16pt; margin-bottom:2px; }
+  .r-hero-date { font-size:8pt; margin-bottom:12px; }
+
+  /* KPI 카드 */
+  .kpi-grid { grid-template-columns:repeat(3,1fr); gap:8px; }
+  .kpi-card { padding:10px 12px; border-radius:8px; }
+  .kpi-label { font-size:8pt; margin-bottom:4px; }
+  .kpi-value { font-size:13pt; }
+
+  /* body 영역 */
+  .r-body { padding:0 !important; }
+
+  /* 섹션 공통 */
+  .section {
+    border-radius:8px;
+    padding:14px 16px;
+    margin-top:10px;
+    border:1px solid #E4E9F0;
+    page-break-inside:avoid;
+  }
+  .sec-title { font-size:12pt; margin-bottom:10px; }
+  .sec-sub   { font-size:8pt;  margin-bottom:10px; margin-top:-6px; }
+
+  /* 도넛 + 레전드 */
+  .donut-layout { flex-direction:row; gap:16px; align-items:flex-start; }
+  .donut-wrap   { width:120px; height:120px; flex-shrink:0; }
+  .legend       { flex:1; }
+  .legend-item  { padding:6px 0; }
+  .legend-name  { font-size:9pt; }
+  .legend-right { grid-template-columns:1fr 1fr; gap:3px; }
+  .legend-cell  { padding:4px 8px; }
+  .legend-cell-label { font-size:7pt; }
+  .legend-cell-value { font-size:10pt; }
+
+  /* alert */
+  .alert { padding:8px 12px; font-size:8pt; margin-top:10px; }
+
+  /* ETF 랭킹 - 거래대금만 표시 */
+  #panel-volume { display:block !important; }
+  .etf-list     { gap:4px; }
+  .etf-item     { padding:6px 10px; }
+  .etf-name     { font-size:9pt; }
+  .etf-detail   { font-size:7pt; }
+  .etf-main-fig { font-size:10pt; }
+  .etf-sub-fig  { font-size:7pt; }
+  .notice-box   { font-size:7pt; padding:6px 10px; margin-top:8px; }
+
+  /* 변경 포트폴리오 섹션 */
+  .pf-step-box  { margin-bottom:6px; }
+  .pf-step-header { padding:8px 12px; }
+  .pf-step-label  { font-size:10pt; }
+  .pf-step-count  { font-size:8pt; }
+  .pf-step-amt    { font-size:9pt; }
+  .pf-product-item { padding:6px 12px; }
+  .pf-prod-name    { font-size:9pt; }
+  .pf-prod-meta    { font-size:7pt; }
+  .pf-prod-amt     { font-size:9pt; }
+  .pf-prod-ret     { font-size:7pt; }
+
+  /* 변경 후 포트폴리오 */
+  #after-portfolio { display:block !important; }
+  .after-item      { padding:6px 12px; }
+  .after-item-type { font-size:7pt; }
+  .after-item-name { font-size:9pt; }
+  .after-item-amt  { font-size:9pt; }
+  .after-item-weight { font-size:7pt; }
+  .pf-warning, .budget-remain { font-size:8pt; padding:6px 10px; }
+
+  /* 페이지 나눔 */
+  .section:nth-of-type(3) { page-break-before:auto; }
 }
 </style>
 </head>
@@ -1088,22 +1176,23 @@ function exportPDF(){
   const name = document.getElementById('r-hero-name')?.textContent?.replace(' 님의 투자분석 리포트','') || 'DC리포트';
 
   const opt = {
-    margin:       [10, 10, 10, 10],       // mm (상 우 하 좌)
+    margin:       [12, 14, 12, 14],
     filename:     `DC투자분석리포트_${name}_${dateStr}.pdf`,
-    image:        { type: 'jpeg', quality: 0.95 },
+    image:        { type: 'jpeg', quality: 0.98 },
     html2canvas:  {
-      scale: 2,                            // 고해상도
+      scale: 2,
       useCORS: true,
       logging: false,
       scrollY: 0,
+      windowWidth: 794,   // A4 픽셀 너비 (96dpi)
     },
     jsPDF:        {
       unit: 'mm',
       format: 'a4',
-      orientation: 'portrait',             // 세로 A4
+      orientation: 'portrait',
       compress: true,
     },
-    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    pagebreak: { mode: ['css','legacy'], before:'.page-break', avoid:'.section' }
   };
 
   html2pdf().set(opt).from(el).save()
