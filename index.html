@@ -374,7 +374,29 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 
 .r-footer{margin-top:32px;padding:0 16px 20px;font-size:10px;color:var(--slate);line-height:1.7;text-align:center;}
 
+/* ── 사번 입력 화면 ── */
+#empno-screen{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 16px;
+  background:linear-gradient(160deg,#001A80 0%,#0033CC 50%,#0055FF 100%);
+}
+.empno-logo{font-size:11px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,.5);margin-bottom:32px;text-align:center;}
+.empno-card{background:var(--white);border-radius:24px;padding:36px 28px;width:100%;max-width:360px;box-shadow:0 24px 80px rgba(0,0,0,.3);}
+.empno-icon{font-size:40px;text-align:center;margin-bottom:16px;}
+.empno-title{font-size:20px;font-weight:900;color:var(--navy);text-align:center;margin-bottom:6px;}
+.empno-sub{font-size:12px;color:var(--slate);text-align:center;margin-bottom:28px;line-height:1.6;}
+.empno-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.empno-field label{font-size:12px;font-weight:700;color:var(--slate);}
+.empno-input{border:1.5px solid var(--line);border-radius:10px;padding:14px;font-size:18px;font-family:inherit;color:var(--text);outline:none;background:#fafbfc;width:100%;text-align:center;font-weight:700;letter-spacing:2px;transition:border-color .15s;-webkit-appearance:none;}
+.empno-input:focus{border-color:var(--blue);background:var(--white);}
+.empno-btn{width:100%;background:var(--blue);color:var(--white);border:none;border-radius:12px;font-size:15px;font-weight:800;padding:16px;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:4px;}
+.empno-btn:active{background:#0044cc;}
+.empno-error{display:none;margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:600;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;text-align:center;}
+.empno-hint{margin-top:16px;font-size:11px;color:var(--slate);text-align:center;line-height:1.7;}
+
 @media print{
+  #empno-screen{display:none!important;}
   #landing{display:none!important;}
   #report{display:block!important;}
   .r-topbar{position:static;}
@@ -384,8 +406,30 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 </head>
 <body>
 
+<!-- ══════════ 사번 입력 화면 ══════════ -->
+<div id="empno-screen">
+  <p class="empno-logo">SAMSUNG LIFE INSURANCE · DC PENSION</p>
+  <div class="empno-card">
+    <div class="empno-icon">🔐</div>
+    <h1 class="empno-title">DC 투자분석 리포트</h1>
+    <p class="empno-sub">사업부 전용 서비스입니다.<br>사번을 입력하고 시작하세요.</p>
+    <div class="empno-field">
+      <label>사번</label>
+      <input class="empno-input" type="text" id="inp-empno"
+        placeholder="사번 입력"
+        inputmode="numeric"
+        maxlength="10"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter')doEmpnoLogin()"/>
+    </div>
+    <button class="empno-btn" onclick="doEmpnoLogin()">시작하기 →</button>
+    <div class="empno-error" id="empno-error">사번을 입력해주세요.</div>
+    <p class="empno-hint">입력한 사번은 접속 기록 관리에 사용됩니다.</p>
+  </div>
+</div>
+
 <!-- ══════════ LANDING ══════════ -->
-<div id="landing">
+<div id="landing" style="display:none;">
   <p class="brand">SAMSUNG LIFE INSURANCE · DC PENSION</p>
   <h1 class="landing-title">퇴직연금 DC<br>투자분석 리포트</h1>
 
@@ -625,6 +669,28 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 
 <script>
 /* ═══════════════════════════════
+   사번 입력
+═══════════════════════════════ */
+function doEmpnoLogin(){
+  const empno = document.getElementById('inp-empno').value.trim();
+  const errEl = document.getElementById('empno-error');
+  if(!empno){
+    errEl.style.display='block';
+    errEl.textContent='사번을 입력해주세요.';
+    document.getElementById('inp-empno').focus();
+    return;
+  }
+  // 사번을 이름 입력란에 자동 입력
+  const nameInput = document.getElementById('inp-name');
+  if(nameInput && !nameInput.value) nameInput.value = empno;
+
+  // 화면 전환
+  document.getElementById('empno-screen').style.display='none';
+  document.getElementById('landing').style.display='flex';
+  errEl.style.display='none';
+}
+
+/* ═══════════════════════════════
    유틸
 ═══════════════════════════════ */
 const COLORS = ['#0055FF','#4D88FF','#7AA8FF','#99BBFF','#C4D7FF','#E2E8F0'];
@@ -776,10 +842,12 @@ function handleExcelUpload(input){
       // 기존 상품 폼 초기화
       document.getElementById('product-list').innerHTML='';
       prodCnt = 0;
-      products.forEach(p => {
-        const pct = totalAmt > 0 ? parseFloat((p.amt / totalAmt * 100).toFixed(1)) : 0;
-        addProduct(p.name, p.type, pct);
-      });
+      // 비중 계산 - 합계가 정확히 100%가 되도록
+      const pcts = products.map(p => totalAmt > 0 ? parseFloat((p.amt / totalAmt * 100).toFixed(1)) : 0);
+      const pctSum = pcts.reduce((s,v)=>s+v, 0);
+      const diff = parseFloat((100 - pctSum).toFixed(1));
+      if(diff !== 0) pcts[0] = parseFloat((pcts[0] + diff).toFixed(1)); // 차이를 첫 항목에 반영
+      products.forEach((p, i) => addProduct(p.name, p.type, pcts[i]));
 
       // 총 적립금 자동 입력 (원 → 천원)
       const totalK = Math.round(totalAmt / 1000);
