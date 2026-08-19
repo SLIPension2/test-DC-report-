@@ -753,7 +753,7 @@ const RISK_LABEL = {aggressive:'공격투자형',growth:'적극투자형',balanc
 const RISK_GRADE_RANGE = {aggressive:[1,2,3,4,5,6],growth:[3,4,5,6],balanced:[4,5,6],stable:[5,6],conservative:[5,6]};
 // 펀드 위험등급 DB (외부 JSON 로드)
 let FUND_GRADE = {};
-fetch('data/fund_grades.json').then(r=>r.json()).then(d=>{FUND_GRADE=d;}).catch(()=>console.warn('fund_grades.json 로드 실패'));
+fetch('fund_grades.json').then(r=>r.json()).then(d=>{FUND_GRADE=d;}).catch(()=>console.warn('fund_grades.json 로드 실패'));
 
 const SAFE_CAP   = {aggressive:20,growth:30,balanced:50,stable:70,conservative:90};
 
