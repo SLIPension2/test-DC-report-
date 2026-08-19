@@ -7,8 +7,10 @@
 <!-- 라이브러리 CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap');
 :root {
   --blue:#0055FF; --blue-mid:#4D88FF; --blue-light:#EBF1FF;
   --navy:#0A1F5C; --slate:#64748B; --smoke:#F5F7FA;
@@ -627,7 +629,7 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 </div>
 
 <!-- ══════════ REPORT ══════════ -->
-<div id="report">
+<div id="report" style="display:none;">
   <div class="r-topbar">
     <button class="btn-back" onclick="goBack()">← 다시 입력</button>
     <span class="r-topbar-title">DC 투자분석 리포트</span>
@@ -1427,7 +1429,7 @@ th{font-weight:600;color:#64748B;font-size:.9em;background:#F1F5F9;}
 </div>
 
 <!-- ══════════ 결과 화면 ══════════ -->
-<div id="result">
+<div id="result" style="display:none;">
   <!-- 상단 고정 바 -->
   <div class="result-topbar">
     <button class="result-back" onclick="goBackToReport()">← 돌아가기</button>
