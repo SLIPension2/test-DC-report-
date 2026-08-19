@@ -744,12 +744,20 @@ input:focus,select:focus{border-color:var(--blue);background:var(--white);}
 
   </div>
 
+  <!-- 변경 반영 버튼 -->
+  <div id="apply-change-wrap" style="display:none;padding:0 16px 16px;">
+    <button onclick="showResultScreen()" style="width:100%;padding:15px;background:linear-gradient(135deg,#001A80,#0044CC);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.5px;">
+      ✅ 변경 반영 · 결과 보기
+    </button>
+  </div>
+
   <p class="r-footer">
     본 리포트는 교육 및 참고 목적으로 제공되며 투자 권유가 아닙니다.<br>
     실제 투자 결정 전 반드시 전문가와 상담하시기 바랍니다.
   </p>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 
 /* ═══════════════════════════════
@@ -1310,6 +1318,66 @@ th{font-weight:600;color:#64748B;font-size:.9em;background:#F1F5F9;}
   .sec-title{color:#0033CC !important;}
   .pct{color:#0055FF !important;}
 }
+
+/* ══ 결과 화면 ══ */
+#result{display:none;min-height:100vh;background:var(--bg);padding:0 0 40px;}
+.result-topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:0.5px solid var(--line);}
+.result-back{background:none;border:none;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:4px;padding:0;}
+.result-pdf-btn{background:#0044CC;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.result-hero{background:linear-gradient(135deg,#001A80,#0044CC);color:white;padding:20px 16px 16px;margin-bottom:12px;}
+.result-hero-sub{font-size:10px;letter-spacing:3px;opacity:.6;margin-bottom:6px;font-weight:600;}
+.result-hero-name{font-size:22px;font-weight:800;margin-bottom:2px;}
+.result-hero-date{font-size:11px;opacity:.65;margin-bottom:14px;}
+.result-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.result-kpi{background:rgba(255,255,255,.13);border-radius:8px;padding:9px 12px;}
+.result-kpi-label{font-size:10px;opacity:.7;margin-bottom:3px;}
+.result-kpi-value{font-size:13px;font-weight:700;line-height:1.2;}
+.result-section{margin:0 12px 10px;background:var(--white);border-radius:12px;border:0.5px solid var(--line);padding:14px;}
+.result-section-title{font-size:11px;font-weight:600;color:var(--slate);margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase;}
+.result-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 12px 10px;}
+.result-card{background:var(--white);border-radius:12px;border:0.5px solid var(--line);padding:14px;}
+.result-donut-wrap{display:flex;align-items:center;gap:12px;}
+.result-legend{font-size:11px;flex:1;}
+.result-legend-item{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.result-legend-item:last-child{margin-bottom:0;}
+.result-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.result-legend-label{color:var(--slate);font-size:10px;flex:1;}
+.result-legend-val{font-weight:700;color:var(--text);font-size:12px;}
+.result-stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--line);}
+.result-stat-row:last-child{border-bottom:none;}
+.result-stat-label{font-size:11px;color:var(--slate);}
+.result-stat-val{font-size:12px;font-weight:600;color:var(--text);}
+.result-stat-val.pos{color:#16A34A;}
+.result-stat-val.neg{color:#DC2626;}
+.result-bar-wrap{margin-bottom:10px;}
+.result-bar-wrap:last-child{margin-bottom:0;}
+.result-bar-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;}
+.result-bar-label-left{color:var(--slate);}
+.result-bar-label-right{font-weight:600;color:var(--text);}
+.result-bar-track{height:8px;background:var(--line);border-radius:4px;overflow:hidden;}
+.result-bar-fill{height:100%;border-radius:4px;transition:width .4s;}
+.result-prod-item{display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:#F8F9FB;border-radius:6px;margin-bottom:4px;}
+.result-prod-item:last-child{margin-bottom:0;}
+.result-prod-left{display:flex;align-items:center;gap:6px;min-width:0;flex:1;}
+.result-prod-name{font-size:10px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.result-prod-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.result-prod-pct{font-size:11px;color:var(--slate);}
+.result-prod-ret{font-size:11px;font-weight:700;}
+.r-tag-keep{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;background:#DCFCE7;color:#166534;flex-shrink:0;}
+.r-tag-new{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;background:#DBEAFE;color:#1E40AF;flex-shrink:0;}
+.result-chart-wrap{position:relative;width:100%;}
+
+/* PDF 인쇄 */
+@media print{
+  #login,#landing,#report,.result-topbar{display:none!important;}
+  #result{display:block!important;padding:0!important;}
+  .result-hero{margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .result-grid2{margin:4mm 4mm 3mm;}
+  .result-section{margin:0 4mm 3mm;}
+  .result-card{border:0.5px solid #e2e8f0;}
+  body{margin:0;padding:0;}
+  @page{size:A4;margin:6mm;}
+}
 </style>
 </head><body>
 
@@ -1357,6 +1425,69 @@ th{font-weight:600;color:#64748B;font-size:.9em;background:#F1F5F9;}
   </div>
 
 </div>
+
+<!-- ══════════ 결과 화면 ══════════ -->
+<div id="result">
+  <!-- 상단 고정 바 -->
+  <div class="result-topbar">
+    <button class="result-back" onclick="goBackToReport()">← 돌아가기</button>
+    <button class="result-pdf-btn" onclick="window.print()">🖨 PDF 저장</button>
+  </div>
+
+  <!-- 파란 헤더 -->
+  <div class="result-hero" id="result-hero">
+    <div class="result-hero-sub">SAMSUNG LIFE INSURANCE · DC PENSION</div>
+    <div class="result-hero-name" id="result-name">-</div>
+    <div class="result-hero-date" id="result-date">-</div>
+    <div class="result-kpi-grid">
+      <div class="result-kpi"><div class="result-kpi-label">투자성향</div><div class="result-kpi-value" id="rk-risk">-</div></div>
+      <div class="result-kpi"><div class="result-kpi-label">총 적립금</div><div class="result-kpi-value" id="rk-total">-</div></div>
+      <div class="result-kpi"><div class="result-kpi-label">총 운용수익</div><div class="result-kpi-value" id="rk-profit">-</div></div>
+    </div>
+  </div>
+
+  <!-- 포트폴리오 도넛 + 수익현황 -->
+  <div class="result-grid2">
+    <div class="result-card">
+      <div class="result-section-title">변경 후 포트폴리오</div>
+      <div class="result-donut-wrap">
+        <svg id="result-donut" viewBox="0 0 80 80" width="76" height="76" style="flex-shrink:0;"></svg>
+        <div class="result-legend" id="result-legend-list"></div>
+      </div>
+    </div>
+    <div class="result-card">
+      <div class="result-section-title">수익 현황</div>
+      <div id="result-stats"></div>
+    </div>
+  </div>
+
+  <!-- 원금 vs 수익 바 -->
+  <div class="result-section">
+    <div class="result-section-title">원금 vs 운용수익</div>
+    <div id="result-bars"></div>
+  </div>
+
+  <!-- 상품별 수익 차트 -->
+  <div class="result-section">
+    <div class="result-section-title">상품별 원금 · 수익 비교 (상위 4개)</div>
+    <div class="result-chart-wrap" style="height:170px;">
+      <canvas id="result-prod-chart" role="img" aria-label="상품별 원금 및 운용수익 비교"></canvas>
+    </div>
+    <div id="result-chart-legend" style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--slate);flex-wrap:wrap;"></div>
+  </div>
+
+  <!-- 상품별 수익률 -->
+  <div class="result-section">
+    <div class="result-section-title">변경 후 상품 구성 · 수익률</div>
+    <div id="result-prod-list"></div>
+  </div>
+
+  <p style="margin:16px;font-size:10px;color:var(--slate);line-height:1.7;text-align:center;">
+    본 리포트는 교육 및 참고 목적으로 제공되며 투자 권유가 아닙니다.<br>
+    실제 투자 결정 전 반드시 전문가와 상담하시기 바랍니다.
+  </p>
+</div>
+
 </body></html>`;
 }
 
@@ -1375,6 +1506,160 @@ function loginSubmit(){
   window.scrollTo(0,0);
   // 사번을 리포트에서 활용할 수 있도록 전역 저장
   window._empId = empid;
+}
+
+
+/* ══════════════════════════════════
+   결과 화면 (Result Screen)
+══════════════════════════════════ */
+let resultChartInstance = null;
+
+function goBackToReport(){
+  document.getElementById('result').style.display='none';
+  document.getElementById('report').style.display='block';
+  window.scrollTo(0,0);
+}
+
+function showResultScreen(){
+  // ── 데이터 수집 ──
+  const name     = document.getElementById('inp-name')?.value.trim() || '';
+  const risk     = document.querySelector('input[name=risk]:checked')?.value || 'balanced';
+  const riskLabel= RISK_LABEL[risk];
+  const totalAmt = getAmountValue();
+  const today    = new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+
+  // 유지 상품 + 신규 ETF 합산
+  const keepList  = currentProducts.filter(p=>!excludedSet.has(p.name));
+  const newNames  = Object.keys(portfolio);
+  const {removedAmt} = updateBudget();
+  const keepTotal = keepList.reduce((s,p)=>s+p.amt,0);
+  const newTotal  = newNames.reduce((s,k)=>s+(removedAmt*(portfolio[k]||0)/100),0);
+  const grandTotal= keepTotal+newTotal || totalAmt;
+
+  // 전체 수익 (유지 상품 기준)
+  const totalProfit = keepList.reduce((s,p)=>s+(p.profit||0),0);
+  const principal   = grandTotal - totalProfit;
+
+  // ── 헤더 KPI ──
+  document.getElementById('result-name').textContent = name || '가입자';
+  document.getElementById('result-date').textContent = '기준일: ' + today;
+  document.getElementById('rk-risk').textContent     = riskLabel;
+  document.getElementById('rk-total').textContent    = fmtAmtTotal(grandTotal);
+  const profitEl = document.getElementById('rk-profit');
+  profitEl.textContent = (totalProfit>=0?'+':'')+fmtAmtTotal(totalProfit);
+  profitEl.style.color = totalProfit>=0 ? '#86EFAC' : '#FCA5A5';
+
+  // ── 도넛 차트 ──
+  const safeTypes = ['예금 / 원리금보장형','국내 채권형 펀드'];
+  const safeAmt   = keepList.filter(p=>safeTypes.includes(p.type)).reduce((s,p)=>s+p.amt,0);
+  const riskAmt   = grandTotal - safeAmt;
+  const safePct   = grandTotal>0 ? Math.round(safeAmt/grandTotal*100) : 0;
+  const riskPct   = 100 - safePct;
+  const circ = 2*Math.PI*28;
+  const riskDash  = (riskPct/100*circ).toFixed(1);
+  const safeDash  = (safePct/100*circ).toFixed(1);
+  const riskOffset= 70;
+  const safeOffset= -(riskPct/100*circ - 70);
+  document.getElementById('result-donut').innerHTML = `
+    <circle cx="40" cy="40" r="28" fill="none" stroke="#E2E8F0" stroke-width="11"/>
+    <circle cx="40" cy="40" r="28" fill="none" stroke="#0055FF" stroke-width="11"
+      stroke-dasharray="${riskDash} ${safeDash}" stroke-dashoffset="${riskOffset}"/>
+    ${safePct>0?`<circle cx="40" cy="40" r="28" fill="none" stroke="#93C5FD" stroke-width="11"
+      stroke-dasharray="${safeDash} ${riskDash}" stroke-dashoffset="${safeOffset}"/>`:''}
+    <text x="40" y="37" text-anchor="middle" font-size="12" font-weight="700" fill="#0055FF">${riskPct}%</text>
+    <text x="40" y="49" text-anchor="middle" font-size="7.5" fill="#94A3B8">실적배당</text>
+  `;
+  document.getElementById('result-legend-list').innerHTML = `
+    <div class="result-legend-item"><div class="result-dot" style="background:#0055FF;"></div><span class="result-legend-label">실적배당형</span><span class="result-legend-val">${riskPct}%</span></div>
+    <div class="result-legend-item"><div class="result-dot" style="background:#93C5FD;"></div><span class="result-legend-label">원리금보장형</span><span class="result-legend-val">${safePct}%</span></div>
+  `;
+
+  // ── 수익 현황 ──
+  const retPct = principal>0 ? (totalProfit/principal*100).toFixed(2) : '0.00';
+  const retSign = totalProfit>=0?'+':'';
+  document.getElementById('result-stats').innerHTML = `
+    <div class="result-stat-row"><span class="result-stat-label">원금</span><span class="result-stat-val">${fmtAmtTotal(principal)}</span></div>
+    <div class="result-stat-row"><span class="result-stat-label">운용수익</span><span class="result-stat-val ${totalProfit>=0?'pos':'neg'}">${retSign}${fmtAmtTotal(totalProfit)}</span></div>
+    <div class="result-stat-row"><span class="result-stat-label">수익률</span><span class="result-stat-val ${totalProfit>=0?'pos':'neg'}">${retSign}${retPct}%</span></div>
+  `;
+
+  // ── 원금 vs 수익 바 ──
+  const profitPct = grandTotal>0?Math.round(Math.abs(totalProfit)/grandTotal*100):0;
+  const prinPct   = 100-profitPct;
+  document.getElementById('result-bars').innerHTML = `
+    <div class="result-bar-wrap">
+      <div class="result-bar-label"><span class="result-bar-label-left">원금</span><span class="result-bar-label-right">${fmtAmtTotal(principal)} <span style="color:var(--slate);font-weight:400;">${prinPct}%</span></span></div>
+      <div class="result-bar-track"><div class="result-bar-fill" style="width:${prinPct}%;background:#0055FF;"></div></div>
+    </div>
+    <div class="result-bar-wrap">
+      <div class="result-bar-label"><span class="result-bar-label-left">운용수익</span><span class="result-bar-label-right ${totalProfit>=0?'pos':'neg'}">${retSign}${fmtAmtTotal(totalProfit)} <span style="color:var(--slate);font-weight:400;">${profitPct}%</span></span></div>
+      <div class="result-bar-track"><div class="result-bar-fill" style="width:${profitPct}%;background:${totalProfit>=0?'#16A34A':'#DC2626'};"></div></div>
+    </div>
+  `;
+
+  // ── 상품별 수익 비교 차트 (상위 4개, profit 기준) ──
+  const sortedByProfit = [...keepList].filter(p=>p.profit).sort((a,b)=>Math.abs(b.profit)-Math.abs(a.profit)).slice(0,4);
+  const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+  const gridColor  = isDark?'#2c2c2a':'#e1e0d9';
+  const labelColor = isDark?'#898781':'#898781';
+  const shortName  = n => n.length>8?n.slice(0,8)+'…':n;
+
+  if(resultChartInstance){ resultChartInstance.destroy(); resultChartInstance=null; }
+  const ctx = document.getElementById('result-prod-chart');
+  if(ctx && sortedByProfit.length>0){
+    resultChartInstance = new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels: sortedByProfit.map(p=>shortName(p.name)),
+        datasets:[
+          {label:'원금', data:sortedByProfit.map(p=>Math.round((p.amt||0)-(p.profit||0))), backgroundColor:isDark?'#2c3a5c':'#E2E8F0', borderRadius:4, stack:'a'},
+          {label:'운용수익', data:sortedByProfit.map(p=>Math.round(p.profit||0)), backgroundColor:'#0055FF', borderRadius:4, stack:'a'}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false, indexAxis:'y',
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw||0).toLocaleString()+'원'}}
+        },
+        scales:{
+          x:{stacked:true, grid:{color:gridColor}, ticks:{color:labelColor,font:{size:10},callback:v=>(v/10000).toLocaleString()+'만'}},
+          y:{stacked:true, grid:{display:false}, ticks:{color:labelColor,font:{size:10}}}
+        }
+      }
+    });
+  }
+  document.getElementById('result-chart-legend').innerHTML = `
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#0055FF;display:inline-block;"></span>운용수익</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#E2E8F0;border:0.5px solid #ccc;display:inline-block;"></span>원금</span>
+  `;
+
+  // ── 상품 목록 (유지+신규) ──
+  let prodHtml = '';
+  keepList.forEach(p=>{
+    const pct   = grandTotal>0?Math.round(p.amt/grandTotal*100):0;
+    const ret   = p.retF!=null?((p.retF>=0?'+':'')+p.retF.toFixed(2)+'%'):'';
+    const retCls= p.retF>=0?'pos':'neg';
+    prodHtml+=`<div class="result-prod-item">
+      <div class="result-prod-left"><span class="r-tag-keep">유지</span><span class="result-prod-name">${p.name}</span></div>
+      <div class="result-prod-right"><span class="result-prod-pct">${pct}%</span>${ret?`<span class="result-prod-ret ${retCls}">${ret}</span>`:''}
+      </div></div>`;
+  });
+  newNames.forEach(name=>{
+    const ratio = portfolio[name]||0;
+    const calcAmt= removedAmt>0?removedAmt*ratio/100:0;
+    const pct   = grandTotal>0?Math.round(calcAmt/grandTotal*100):0;
+    prodHtml+=`<div class="result-prod-item">
+      <div class="result-prod-left"><span class="r-tag-new">신규</span><span class="result-prod-name">${name}</span></div>
+      <div class="result-prod-right"><span class="result-prod-pct">${pct}%</span><span class="result-prod-ret" style="color:var(--slate);">-</span>
+      </div></div>`;
+  });
+  document.getElementById('result-prod-list').innerHTML = prodHtml;
+
+  // ── 화면 전환 ──
+  document.getElementById('report').style.display='none';
+  document.getElementById('result').style.display='block';
+  window.scrollTo(0,0);
 }
 
 function goBack(){
@@ -1567,6 +1852,8 @@ function renderAfterPortfolio(){
   if(addCount) addCount.textContent=`${newNames.length}개`;
   if(keepList.length===0&&newNames.length===0){afterEl.style.display='none';return;}
   afterEl.style.display='block';
+  const applyWrap = document.getElementById('apply-change-wrap');
+  if(applyWrap) applyWrap.style.display='block';
 
   const {removedAmt, usedPct, remainPct} = updateBudget();
 
@@ -13894,5 +14181,68 @@ function filterEtf(){ renderEtfList(); }
 document.addEventListener('DOMContentLoaded', ()=>{ updatePctSum(); });
 
 </script>
+
+<!-- ══════════ 결과 화면 ══════════ -->
+<div id="result">
+  <!-- 상단 고정 바 -->
+  <div class="result-topbar">
+    <button class="result-back" onclick="goBackToReport()">← 돌아가기</button>
+    <button class="result-pdf-btn" onclick="window.print()">🖨 PDF 저장</button>
+  </div>
+
+  <!-- 파란 헤더 -->
+  <div class="result-hero" id="result-hero">
+    <div class="result-hero-sub">SAMSUNG LIFE INSURANCE · DC PENSION</div>
+    <div class="result-hero-name" id="result-name">-</div>
+    <div class="result-hero-date" id="result-date">-</div>
+    <div class="result-kpi-grid">
+      <div class="result-kpi"><div class="result-kpi-label">투자성향</div><div class="result-kpi-value" id="rk-risk">-</div></div>
+      <div class="result-kpi"><div class="result-kpi-label">총 적립금</div><div class="result-kpi-value" id="rk-total">-</div></div>
+      <div class="result-kpi"><div class="result-kpi-label">총 운용수익</div><div class="result-kpi-value" id="rk-profit">-</div></div>
+    </div>
+  </div>
+
+  <!-- 포트폴리오 도넛 + 수익현황 -->
+  <div class="result-grid2">
+    <div class="result-card">
+      <div class="result-section-title">변경 후 포트폴리오</div>
+      <div class="result-donut-wrap">
+        <svg id="result-donut" viewBox="0 0 80 80" width="76" height="76" style="flex-shrink:0;"></svg>
+        <div class="result-legend" id="result-legend-list"></div>
+      </div>
+    </div>
+    <div class="result-card">
+      <div class="result-section-title">수익 현황</div>
+      <div id="result-stats"></div>
+    </div>
+  </div>
+
+  <!-- 원금 vs 수익 바 -->
+  <div class="result-section">
+    <div class="result-section-title">원금 vs 운용수익</div>
+    <div id="result-bars"></div>
+  </div>
+
+  <!-- 상품별 수익 차트 -->
+  <div class="result-section">
+    <div class="result-section-title">상품별 원금 · 수익 비교 (상위 4개)</div>
+    <div class="result-chart-wrap" style="height:170px;">
+      <canvas id="result-prod-chart" role="img" aria-label="상품별 원금 및 운용수익 비교"></canvas>
+    </div>
+    <div id="result-chart-legend" style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--slate);flex-wrap:wrap;"></div>
+  </div>
+
+  <!-- 상품별 수익률 -->
+  <div class="result-section">
+    <div class="result-section-title">변경 후 상품 구성 · 수익률</div>
+    <div id="result-prod-list"></div>
+  </div>
+
+  <p style="margin:16px;font-size:10px;color:var(--slate);line-height:1.7;text-align:center;">
+    본 리포트는 교육 및 참고 목적으로 제공되며 투자 권유가 아닙니다.<br>
+    실제 투자 결정 전 반드시 전문가와 상담하시기 바랍니다.
+  </p>
+</div>
+
 </body>
 </html>
