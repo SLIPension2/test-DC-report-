@@ -2028,8 +2028,8 @@ function renderCurrentProducts(){
           <button class="ps-tab ${ps.mode==='amt'?'on':''}" onclick="setPartialMode('${sn}','amt',${p.amt})">금액</button>
           <button class="ps-tab ${ps.mode==='pct'?'on':''}" onclick="setPartialMode('${sn}','pct',${p.amt})">비율</button>
         </div>
-        ${ps.mode==='amt'?`<input class="ps-input" type="text" placeholder="만원" value="${ps.value?Math.round(ps.value/10000):''}" oninput="setPartialAmt('${sn}','amt',this.value,${p.amt})"/> <span class="ps-unit">만원</span><span class="ps-remain" data-name="${sn}">잔여 ${fmtAmt(p.amt-(ps.value||0))} 유지</span>`:''}
-        ${ps.mode==='pct'?`<input class="ps-input" type="text" placeholder="%" value="${ps.value||''}" oninput="setPartialAmt('${sn}','pct',this.value,${p.amt})"/> <span class="ps-unit">%</span><span class="ps-remain" data-name="${sn}">잔여 ${fmtAmt(p.amt*(1-(ps.value||0)/100))} 유지</span>`:''}
+        ${ps.mode==='amt'?`<input class="ps-input" type="text" placeholder="만원" value="${ps.value?Math.round(ps.value/10000):''}" oninput="setPartialAmt('${sn}','amt',this.value,${p.amt})"/> <span class="ps-unit">만원 매도</span>`:''}
+        ${ps.mode==='pct'?`<input class="ps-input" type="text" placeholder="%" value="${ps.value||''}" oninput="setPartialAmt('${sn}','pct',this.value,${p.amt})"/> <span class="ps-unit">% 매도</span>`:''}
         ${ps.mode==='all'?`<span class="ps-remain">${fmtAmt(p.amt)} 전액 매도</span>`:''}
       </div>` : '';
     return `<div class="pf-product-item" onclick="toggleExclude('${sn}')">
