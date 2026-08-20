@@ -1567,6 +1567,7 @@ function goBackToReport(){
 }
 
 function showResultScreen(){
+  try{
   // ── 데이터 수집 ──
   const name     = document.getElementById('inp-name')?.value.trim() || '';
   const risk     = document.querySelector('input[name=risk]:checked')?.value || 'balanced';
@@ -1819,6 +1820,10 @@ function showResultScreen(){
   document.getElementById('report').style.display='none';
   document.getElementById('result').style.display='block';
   window.scrollTo(0,0);
+  }catch(e){
+    console.error('showResultScreen 에러:', e);
+    alert('오류: ' + e.message);
+  }
 }
 
 function goBack(){
