@@ -1494,7 +1494,7 @@ function buildPdfHtml(nameArg){
 
   <!-- 상품별 수익 차트 -->
   <div class="result-section">
-    <div class="result-section-title">상품별 원금 · 수익 비교 (상위 4개)</div>
+    <div class="result-section-title">주요 상품 수익 현황</div>
     <div class="result-chart-wrap" style="height:120px;">
       <canvas id="result-prod-chart" role="img" aria-label="상품별 원금 및 운용수익 비교"></canvas>
     </div>
@@ -1502,7 +1502,7 @@ function buildPdfHtml(nameArg){
   </div>
   <!-- 상품별 수익률 -->
   <div class="result-section">
-    <div class="result-section-title">변경 후 상품 구성 · 수익률</div>
+    <div class="result-section-title">변경 후 상품 구성 · 금액</div>
     <div id="result-prod-list"></div>
   </div>
 
@@ -1581,7 +1581,17 @@ function showResultScreen(){
   const today    = new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
 
   // 유지 상품 + 신규 ETF 합산
-  const keepList  = currentProducts.filter(p=>!excludedSet.has(p.name));
+  const fullyExcluded2 = new Set([...excludedSet].filter(name=>{
+    const ps = partialSell[name];
+    return !ps || ps.mode==='all';
+  }));
+  const keepList  = currentProducts.filter(p=>!fullyExcluded2.has(p.name)).map(p=>{
+    if(excludedSet.has(p.name)){
+      const sellAmt = getPartialSellAmt(p);
+      return {...p, amt: p.amt - sellAmt, profit: Math.round((p.profit||0)*(1-sellAmt/p.amt))};
+    }
+    return p;
+  });
   const newNames  = Object.keys(portfolio);
   const {removedAmt} = updateBudget();
   const keepTotal = keepList.reduce((s,p)=>s+p.amt,0);
@@ -1589,7 +1599,7 @@ function showResultScreen(){
   const grandTotal= keepTotal+newTotal || totalAmt;
 
   // 전체 수익 (유지 상품 기준)
-  const totalProfit = keepList.reduce((s,p)=>s+(p.profit||0),0);
+  const totalProfit = currentProducts.reduce((s,p)=>s+(p.profit||0),0);
   const principal   = grandTotal - totalProfit;
 
   // ── 헤더 KPI ──
@@ -1650,7 +1660,7 @@ function showResultScreen(){
   `;
 
   // ── 상품별 수익 비교 차트 (상위 4개, profit 기준) ──
-  const sortedByProfit = [...keepList].filter(p=>p.profit).sort((a,b)=>Math.abs(b.profit)-Math.abs(a.profit)).slice(0,4);
+  const const sortedByProfit = [...currentProducts].filter(p=>p.profit).sort((a,b)=>Math.abs(b.profit)-Math.abs(a.profit)).slice(0, Math.min(Math.max(currentProducts.filter(p=>p.profit).length, 2), 4));
   const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
   const gridColor  = isDark?'#2c2c2a':'#e1e0d9';
   const labelColor = isDark?'#898781':'#898781';
@@ -1687,23 +1697,24 @@ function showResultScreen(){
   `;
 
   // ── 상품 목록 (유지+신규) ──
+  // ── 변경 후 상품 구성·금액 ──
   let prodHtml = '';
   keepList.forEach(p=>{
-    const pct   = grandTotal>0?Math.round(p.amt/grandTotal*100):0;
-    const ret   = p.retF!=null?((p.retF>=0?'+':'')+p.retF.toFixed(2)+'%'):'';
-    const retCls= p.retF>=0?'pos':'neg';
+    const pct   = grandTotal>0?(p.amt/grandTotal*100).toFixed(1):0;
+    const tag   = p._partial ? '<span class="r-tag-keep" style="background:#FEF3C7;color:#92400E;">일부유지</span>' : '<span class="r-tag-keep">유지</span>';
     prodHtml+=`<div class="result-prod-item">
-      <div class="result-prod-left"><span class="r-tag-keep">유지</span><span class="result-prod-name">${p.name}</span></div>
-      <div class="result-prod-right"><span class="result-prod-pct">${pct}%</span>${ret?`<span class="result-prod-ret ${retCls}">${ret}</span>`:''}
+      <div class="result-prod-left">${tag}<span class="result-prod-name">${p.name}</span></div>
+      <div class="result-prod-right"><span class="result-prod-pct">${pct}%</span><span class="result-prod-ret" style="color:#1A202C;">${fmtAmt(p.amt)}</span>
       </div></div>`;
   });
   newNames.forEach(name=>{
     const ratio = portfolio[name]||0;
     const calcAmt= removedAmt>0?removedAmt*ratio/100:0;
-    const pct   = grandTotal>0?Math.round(calcAmt/grandTotal*100):0;
+    const pct   = grandTotal>0?(calcAmt/grandTotal*100).toFixed(1):0;
     prodHtml+=`<div class="result-prod-item">
       <div class="result-prod-left"><span class="r-tag-new">신규</span><span class="result-prod-name">${name}</span></div>
-      <div class="result-prod-right"><span class="result-prod-pct">${pct}%</span><span class="result-prod-ret" style="color:#64748B;">-</span>
+      <div class="result-prod-right"><span class="result-prod-pct">${pct}%</span><span class="result-prod-ret" style="color:#1A202C;">${fmtAmt(calcAmt)}</span>
+      </div></div>`;>-</span>
       </div></div>`;
   });
   document.getElementById('result-prod-list').innerHTML = prodHtml;
@@ -2120,7 +2131,19 @@ function updateBudget(){
 }
 
 function renderAfterPortfolio(){
-  const keepList = currentProducts.filter(p=>!excludedSet.has(p.name));
+  // 완전 매도 상품만 제외, 일부 매도는 잔여 금액으로 유지 목록에 포함
+  const fullyExcluded = new Set([...excludedSet].filter(name=>{
+    const ps = partialSell[name];
+    return !ps || ps.mode==='all';
+  }));
+  const keepList = currentProducts.filter(p=>!fullyExcluded.has(p.name)).map(p=>{
+    // 일부 매도 상품은 잔여 금액으로 표시
+    if(excludedSet.has(p.name)){
+      const sellAmt = getPartialSellAmt(p);
+      return {...p, amt: p.amt - sellAmt, _partial: true};
+    }
+    return p;
+  });
   const newNames = Object.keys(portfolio); // {name: 비율(0~100)}
   const afterEl  = document.getElementById('after-portfolio');
   const listEl   = document.getElementById('list-after');
@@ -2143,8 +2166,9 @@ function renderAfterPortfolio(){
   // 유지 상품
   keepList.forEach(p=>{
     const pctStr = grandTotal>0 ? `(${fmtPct(p.amt, grandTotal)})` : '';
+    const partialTag = p._partial ? `<span class="after-item-type" style="background:#FEF3C7;color:#92400E;">일부유지</span>` : `<span class="after-item-type type-keep">유지</span>`;
     html+=`<div class="after-item">
-      <span class="after-item-type type-keep">유지</span>
+      ${partialTag}
       <span class="after-item-name">${p.name}</span>
       <div class="after-item-right">
         <span class="after-item-amt">${fmtAmt(p.amt)}</span>
@@ -2361,7 +2385,7 @@ document.addEventListener('DOMContentLoaded', ()=>{ updatePctSum(); });
 
   <!-- 상품별 수익 차트 -->
   <div class="result-section">
-    <div class="result-section-title">상품별 원금 · 수익 비교 (상위 4개)</div>
+    <div class="result-section-title">주요 상품 수익 현황</div>
     <div class="result-chart-wrap" style="height:120px;">
       <canvas id="result-prod-chart" role="img" aria-label="상품별 원금 및 운용수익 비교"></canvas>
     </div>
@@ -2370,7 +2394,7 @@ document.addEventListener('DOMContentLoaded', ()=>{ updatePctSum(); });
 
   <!-- 상품별 수익률 -->
   <div class="result-section">
-    <div class="result-section-title">변경 후 상품 구성 · 수익률</div>
+    <div class="result-section-title">변경 후 상품 구성 · 금액</div>
     <div id="result-prod-list"></div>
   </div>
 
