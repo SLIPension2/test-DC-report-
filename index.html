@@ -650,7 +650,7 @@ th{font-weight:600;color:#64748B;font-size:.9em;background:#F1F5F9;}
 <!-- ══════════ LANDING ══════════ -->
 <div id="landing" style="display:none;">
   <p class="brand">SAMSUNG LIFE INSURANCE · DC PENSION</p>
-  <h1 class="landing-title">퇴직연금 DC<br>투자분석 리포트</h1>
+  <h1 class="landing-title">퇴직연금 DC/IRP<br>투자분석 리포트</h1>
 
 
   <div class="form-card">
@@ -750,7 +750,7 @@ th{font-weight:600;color:#64748B;font-size:.9em;background:#F1F5F9;}
 <div id="report" style="display:none;">
   <div class="r-topbar">
     <button class="btn-back" onclick="goBack()">← 다시 입력</button>
-    <span class="r-topbar-title">DC 투자분석 리포트</span>
+    <span class="r-topbar-title">DC/IRP 투자분석 리포트</span>
 
   </div>
 
@@ -1280,7 +1280,7 @@ function exportPDF(){
   }
 
   const now = new Date();
-  const name = document.getElementById('r-hero-name')?.textContent?.replace(' 님의 투자분석 리포트','') || 'DC리포트';
+  const name = document.getElementById('r-hero-name')?.textContent?.replace(' 님의 투자분석 리포트','') || 'DC/IRP리포트';
 
   // PDF 전용 HTML 생성 후 새 창에서 인쇄
   const pdfHtml = buildPdfHtml(name);
@@ -1382,7 +1382,7 @@ function buildPdfHtml(nameArg){
   const fs = itemCount > 20 ? '6.5pt' : itemCount > 14 ? '7.5pt' : '8.5pt';
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>DC투자분석리포트_${name}</title>
+<title>DC/IRP투자분석리포트_${name}</title>
 
 </head><body>
 
@@ -1532,9 +1532,9 @@ async function saveAsImage(){
       logging:false
     });
     const link = document.createElement('a');
-    const name = document.getElementById('result-name')?.textContent||'DC리포트';
+    const name = document.getElementById('result-name')?.textContent||'DC/IRP리포트';
     const date = new Date().toISOString().slice(0,10);
-    link.download = `${name}_DC리포트_${date}.jpg`;
+    link.download = `${name}_DC_IRP리포트_${date}.jpg`;
     link.href = canvas.toDataURL('image/jpeg',0.95);
     link.click();
   }catch(e){
