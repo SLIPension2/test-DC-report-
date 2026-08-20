@@ -1232,7 +1232,8 @@ function toggleExportMenu(){
   m.style.display = m.style.display==='none' ? 'block' : 'none';
 }
 function closeExportMenu(){
-  document.getElementById('export-menu').style.display='none';
+  const m=document.getElementById('export-menu');
+  if(m) m.style.display='none';
 }
 // 메뉴 외부 클릭 시 닫기
 document.addEventListener('click', e=>{
@@ -1472,29 +1473,6 @@ function buildPdfHtml(nameArg){
     </div>
     <div id="result-chart-legend" style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--slate);flex-wrap:wrap;"></div>
   </div>
-
-
-  <!-- ① 위험등급 분포 -->
-  <div class="result-section">
-    <div class="result-section-title">위험등급 분포</div>
-    <div id="result-grade-bars"></div>
-  </div>
-
-  <!-- ② 변경 전후 비교 -->
-  <div class="result-section" id="result-compare-section">
-    <div class="result-section-title">변경 전 vs 변경 후</div>
-    <div id="result-compare"></div>
-  </div>
-
-  <!-- ④ 상품 유형별 세분화 -->
-  <div class="result-section">
-    <div class="result-section-title">상품 유형별 구성</div>
-    <div style="position:relative;height:140px;">
-      <canvas id="result-type-chart" role="img" aria-label="상품유형별 구성 차트"></canvas>
-    </div>
-    <div id="result-type-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:10px;color:#64748B;"></div>
-  </div>
-
   <!-- 상품별 수익률 -->
   <div class="result-section">
     <div class="result-section-title">변경 후 상품 구성 · 수익률</div>
@@ -14400,6 +14378,27 @@ document.addEventListener('DOMContentLoaded', ()=>{ updatePctSum(); });
   <div class="result-section">
     <div class="result-section-title">변경 후 상품 구성 · 수익률</div>
     <div id="result-prod-list"></div>
+  </div>
+
+  <!-- ① 위험등급 분포 -->
+  <div class="result-section">
+    <div class="result-section-title">위험등급 분포</div>
+    <div id="result-grade-bars"></div>
+  </div>
+
+  <!-- ② 변경 전후 비교 -->
+  <div class="result-section">
+    <div class="result-section-title">변경 전 vs 변경 후</div>
+    <div id="result-compare"></div>
+  </div>
+
+  <!-- ④ 상품 유형별 세분화 -->
+  <div class="result-section">
+    <div class="result-section-title">상품 유형별 구성</div>
+    <div style="position:relative;height:140px;">
+      <canvas id="result-type-chart" role="img" aria-label="상품유형별 구성 차트"></canvas>
+    </div>
+    <div id="result-type-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:10px;color:#64748B;"></div>
   </div>
 
   <p style="margin:16px;font-size:10px;color:var(--slate);line-height:1.7;text-align:center;">
