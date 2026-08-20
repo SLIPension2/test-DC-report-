@@ -2177,7 +2177,7 @@ function renderEtfList(){
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
         <span class="etf-pick-tag ${TAG_CLASS[e.cat]||'tag-other'}" onclick="toggleEtf('${safeName}')">${e.tag}</span>
-        <button class="holdings-btn" onclick="event.stopPropagation();showHoldings('${safeCode}','${safeName}')" title="네이버 금융에서 구성종목 보기">🔍 구성</button>
+        ${e.cat&&e.cat.startsWith('fund_')?'':'<button class="holdings-btn" onclick="event.stopPropagation();showHoldings(\''+safeCode+'\',\''+safeName+'\')" title="네이버 금융에서 구성종목 보기">🔍 구성</button>'}
       </div>
     </div>`;
   }).join('');
