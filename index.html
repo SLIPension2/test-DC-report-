@@ -954,6 +954,7 @@ function updatePctSum(){
   const inputs = document.querySelectorAll('#product-list .product-row input[type=number]');
   let total = 0;
   inputs.forEach(i => total += parseFloat(i.value)||0);
+  total = Math.round(total * 100) / 100;  // 부동소수점 오류 방지
   const bar = document.getElementById('pct-sum-bar');
   const num = document.getElementById('pct-sum-num');
   num.textContent = `${total}%`;
