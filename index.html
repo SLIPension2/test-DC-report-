@@ -1660,7 +1660,7 @@ function showResultScreen(){
   `;
 
   // ── 상품별 수익 비교 차트 (상위 4개, profit 기준) ──
-  const const sortedByProfit = [...currentProducts].filter(p=>p.profit).sort((a,b)=>Math.abs(b.profit)-Math.abs(a.profit)).slice(0, Math.min(Math.max(currentProducts.filter(p=>p.profit).length, 2), 4));
+  const sortedByProfit = [...currentProducts].filter(p=>p.profit).sort((a,b)=>Math.abs(b.profit)-Math.abs(a.profit)).slice(0, Math.min(Math.max(currentProducts.filter(p=>p.profit).length, 2), 4));
   const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
   const gridColor  = isDark?'#2c2c2a':'#e1e0d9';
   const labelColor = isDark?'#898781':'#898781';
