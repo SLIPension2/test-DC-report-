@@ -2263,7 +2263,7 @@ function renderEtfList(){
   if(!el) return;
   if(!filtered.length){el.innerHTML=`<div class="etf-empty">검색 결과가 없습니다.</div>`;return;}
   const shown=filtered.slice(0,100);
-  const fmtR=(v)=>v!=null?`<span class="${v>=0?'fig-up':'fig-down'}">${v>=0?'+':''}${v}%</span>`:'<span style="color:var(--slate)">-</span>';
+  const fmtR=(v)=>v!=null?`<span class="${v>=0?'fig-up':'fig-down'}">${v>=0?'+':''}${Number(v).toFixed(2)}%</span>`:'<span style="color:var(--slate)">-</span>';
   el.innerHTML=shown.map(e=>{
     const sel=portfolio.hasOwnProperty(e.name);
     const safeCode = (e.code||'').replace(/'/g,"\\'");
